@@ -17,12 +17,17 @@
 #if os(Linux)
     
     import Foundation
+    import CoreFoundation
     import Result
     
     private func thread_proc(pm: UnsafeMutablePointer<Void>) -> UnsafeMutablePointer<Void> {
         let pthread = Unmanaged<PThread>.fromOpaque(COpaquePointer(pm)).takeRetainedValue()
         pthread.task?()
         return nil
+    }
+
+    private extension NSString {
+        var cfString: CFString { return unsafeBitCast(self, CFString.self) }
     }
     
     private class PThread {
@@ -42,28 +47,78 @@
             pthread_create(thread, nil, thread_proc, UnsafeMutablePointer<Void>(Unmanaged.passRetained(self).toOpaque()))
         }
     }
+
+    private func sourceMain(rls: UnsafeMutablePointer<Void>) -> Void {
+            let runLoopSource = Unmanaged<RunLoopSource>.fromOpaque(COpaquePointer(rls)).takeUnretainedValue()
+            runLoopSource.runTask()
+    }
+
+    private func sourceRelease(rls: UnsafePointer<Void>) -> Void {
+        Unmanaged<RunLoopSource>.fromOpaque(COpaquePointer(rls)).release()
+    }
+
+    private class RunLoopSource {
+        private var cfSource:CFRunLoopSource? = nil
+        private let task:SafeTask?
+
+        init(task: SafeTask? = nil) {
+            self.task = task
+        }
+
+        deinit {
+            if let s = cfSource {
+                if CFRunLoopSourceIsValid(s) { CFRunLoopSourceInvalidate(s) }
+            }
+        }
+
+        private func runTask() {
+            task?()
+            if let s = cfSource {
+                if CFRunLoopSourceIsValid(s) { CFRunLoopSourceInvalidate(s) }
+                cfSource = nil
+            }
+        }
+
+        func addToRunLoop(runLoop:CFRunLoop, mode: CFString) {
+            if cfSource == nil {
+                if task != nil {
+                    var source = CFRunLoopSourceContext(
+                        version: 0,
+                        info: UnsafeMutablePointer<Void>(Unmanaged.passRetained(self).toOpaque()),
+                        retain: nil,
+                        release: sourceRelease,
+                        copyDescription: nil,
+                        equal: nil,
+                        hash: nil,
+                        schedule: nil,
+                        cancel: nil,
+                        perform: sourceMain
+                    )
+                    self.cfSource = CFRunLoopSourceCreate(nil, 0, &source)
+                } else {
+                    return
+                }
+            }
+            
+            CFRunLoopAddSource(runLoop, cfSource!, mode)
+            CFRunLoopSourceSignal(cfSource!)
+        }
+    }
     
     private extension ExecutionContextType {
         func syncThroughAsync<ReturnType>(task:() throws -> ReturnType) throws -> ReturnType {
             var result:Result<ReturnType, AnyError>?
             
-            print("let cond = NSCondition()")
             let cond = NSCondition()
-            print("cond.lock()")
             cond.lock()
-            print("async {")
+
             async {
-                print("result = materialize(task)")
                 result = materialize(task)
-                print("cond.signal()")
                 cond.signal()
-                print("}")
             }
-            print("cond.wait()")
+            
             cond.wait()
-            print("cond.unlock()")
             cond.unlock()
-            print("return try result!.dematerializeAnyError()")
             
             return try result!.dematerializeAnyError()
         }
@@ -82,6 +137,7 @@
     
     private class SerialContext : ExecutionContextBase, ExecutionContextType {
         private let rl:CFRunLoop!
+        private static let defaultMode = "kCFRunLoopDefaultMode".bridge().cfString
         
         override init() {
             var runLoop:CFRunLoop?
@@ -101,15 +157,21 @@
         init(runLoop:CFRunLoop!) {
             rl = runLoop
         }
+
+        deinit {
+            CFRunLoopStop(rl)
+        }
         
         static func defaultLoop() {
-            while true {
-                CFRunLoopRunInMode("kCFRunLoopDefaultMode", 0, true)
-            }
+            while CFRunLoopRunInMode(defaultMode, 0, true) != Int32(kCFRunLoopRunStopped) {}
+        }
+
+        private func performRunLoopSource(rls: RunLoopSource) {
+            rls.addToRunLoop(rl, mode: SerialContext.defaultMode)
         }
         
         func async(task:SafeTask) {
-            CFRunLoopPerformBlock(rl, "kCFRunLoopDefaultMode", task)
+            performRunLoopSource(RunLoopSource(task:task))
         }
         
         func sync<ReturnType>(task:() throws -> ReturnType) throws -> ReturnType {
