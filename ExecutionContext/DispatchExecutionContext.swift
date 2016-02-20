@@ -41,6 +41,17 @@
             }
         }
         
+        public func async(after:Double, task:SafeTask) {
+            if after > 0 {
+                let time = dispatch_time(DISPATCH_TIME_NOW, Int64(after * NSTimeInterval(NSEC_PER_SEC)))
+                dispatch_after(time, queue) {
+                    task()
+                }
+            } else {
+                async(task)
+            }
+        }
+        
         public func sync<ReturnType>(task:() throws -> ReturnType) throws -> ReturnType {
             if dispatch_queue_get_label(DISPATCH_CURRENT_QUEUE_LABEL) == dispatch_queue_get_label(queue) {
                 return try task()

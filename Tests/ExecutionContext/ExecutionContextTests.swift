@@ -44,11 +44,40 @@ class ExecutionContextTests: XCTestCase {
         self.waitForExpectationsWithTimeout(2, handler: nil)
     }
     
+    func afterTest(context:ExecutionContextType) {
+        let expectation = self.expectationWithDescription("OK AFTER")
+        
+        context.async(0.5) {
+            sleep(1)
+            expectation.fulfill()
+        }
+        
+        self.waitForExpectationsWithTimeout(2, handler: nil)
+    }
+    
+    func afterTestAdvanced(context:ExecutionContextType) {
+        var ok = true
+        
+        context.async(3) {
+            ok = false
+        }
+        
+        sleep(2)
+        
+        XCTAssert(ok)
+        
+        sleep(2)
+        
+        XCTAssertFalse(ok)
+    }
+    
     func testSerial() {
         let context:ExecutionContextType = DefaultExecutionContext(kind: .Serial)
         
         syncTest(context)
         asyncTest(context)
+        afterTest(context)
+        afterTestAdvanced(context)
     }
     
     func testParallel() {
@@ -56,6 +85,8 @@ class ExecutionContextTests: XCTestCase {
         
         syncTest(context)
         asyncTest(context)
+        afterTest(context)
+        afterTestAdvanced(context)
     }
     
     func testGlobal() {
@@ -63,6 +94,8 @@ class ExecutionContextTests: XCTestCase {
         
         syncTest(context)
         asyncTest(context)
+        afterTest(context)
+        afterTestAdvanced(context)
     }
     
     func testMain() {
@@ -70,6 +103,8 @@ class ExecutionContextTests: XCTestCase {
         
         syncTest(context)
         asyncTest(context)
+        afterTest(context)
+        //afterTestAdvanced - no it will not work here
     }
 }
 
