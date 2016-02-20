@@ -47,7 +47,7 @@
 /* Begin PBXFileReference section */
 		659E807E1C77450200DE85B1 /* ExecutionContext.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = ExecutionContext.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		659E80831C77450200DE85B1 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
-		659E80881C77450200DE85B1 /* ExecutionContextTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = ExecutionContextTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+		659E80881C77450200DE85B1 /* ExecutionContextTests-OSX.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = "ExecutionContextTests-OSX.xctest"; sourceTree = BUILT_PRODUCTS_DIR; };
 		659E808D1C77450200DE85B1 /* ExecutionContextTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ExecutionContextTests.swift; sourceTree = "<group>"; };
 		659E808F1C77450200DE85B1 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		659E80981C77457E00DE85B1 /* DefaultExecutionContext.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = DefaultExecutionContext.swift; sourceTree = "<group>"; };
@@ -94,7 +94,7 @@
 			isa = PBXGroup;
 			children = (
 				659E807E1C77450200DE85B1 /* ExecutionContext.framework */,
-				659E80881C77450200DE85B1 /* ExecutionContextTests.xctest */,
+				659E80881C77450200DE85B1 /* ExecutionContextTests-OSX.xctest */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -144,9 +144,9 @@
 /* End PBXHeadersBuildPhase section */
 
 /* Begin PBXNativeTarget section */
-		659E807D1C77450200DE85B1 /* ExecutionContext */ = {
+		659E807D1C77450200DE85B1 /* ExecutionContext-OSX */ = {
 			isa = PBXNativeTarget;
-			buildConfigurationList = 659E80921C77450200DE85B1 /* Build configuration list for PBXNativeTarget "ExecutionContext" */;
+			buildConfigurationList = 659E80921C77450200DE85B1 /* Build configuration list for PBXNativeTarget "ExecutionContext-OSX" */;
 			buildPhases = (
 				659E80791C77450200DE85B1 /* Sources */,
 				659E807A1C77450200DE85B1 /* Frameworks */,
@@ -157,14 +157,14 @@
 			);
 			dependencies = (
 			);
-			name = ExecutionContext;
+			name = "ExecutionContext-OSX";
 			productName = ExecutionContext;
 			productReference = 659E807E1C77450200DE85B1 /* ExecutionContext.framework */;
 			productType = "com.apple.product-type.framework";
 		};
-		659E80871C77450200DE85B1 /* ExecutionContextTests */ = {
+		659E80871C77450200DE85B1 /* ExecutionContextTests-OSX */ = {
 			isa = PBXNativeTarget;
-			buildConfigurationList = 659E80951C77450200DE85B1 /* Build configuration list for PBXNativeTarget "ExecutionContextTests" */;
+			buildConfigurationList = 659E80951C77450200DE85B1 /* Build configuration list for PBXNativeTarget "ExecutionContextTests-OSX" */;
 			buildPhases = (
 				659E80841C77450200DE85B1 /* Sources */,
 				659E80851C77450200DE85B1 /* Frameworks */,
@@ -176,9 +176,9 @@
 			dependencies = (
 				659E808B1C77450200DE85B1 /* PBXTargetDependency */,
 			);
-			name = ExecutionContextTests;
+			name = "ExecutionContextTests-OSX";
 			productName = ExecutionContextTests;
-			productReference = 659E80881C77450200DE85B1 /* ExecutionContextTests.xctest */;
+			productReference = 659E80881C77450200DE85B1 /* ExecutionContextTests-OSX.xctest */;
 			productType = "com.apple.product-type.bundle.unit-test";
 		};
 /* End PBXNativeTarget section */
@@ -211,8 +211,8 @@
 			projectDirPath = "";
 			projectRoot = "";
 			targets = (
-				659E807D1C77450200DE85B1 /* ExecutionContext */,
-				659E80871C77450200DE85B1 /* ExecutionContextTests */,
+				659E807D1C77450200DE85B1 /* ExecutionContext-OSX */,
+				659E80871C77450200DE85B1 /* ExecutionContextTests-OSX */,
 			);
 		};
 /* End PBXProject section */
@@ -261,7 +261,7 @@
 /* Begin PBXTargetDependency section */
 		659E808B1C77450200DE85B1 /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
-			target = 659E807D1C77450200DE85B1 /* ExecutionContext */;
+			target = 659E807D1C77450200DE85B1 /* ExecutionContext-OSX */;
 			targetProxy = 659E808A1C77450200DE85B1 /* PBXContainerItemProxy */;
 		};
 /* End PBXTargetDependency section */
@@ -371,7 +371,7 @@
 				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Frameworks";
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/../Frameworks @loader_path/Frameworks";
 				PRODUCT_BUNDLE_IDENTIFIER = xyz.crossroadlabs.ExecutionContext;
-				PRODUCT_NAME = "$(TARGET_NAME)";
+				PRODUCT_NAME = "$(PROJECT_NAME)";
 				SKIP_INSTALL = YES;
 				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
 			};
@@ -395,7 +395,7 @@
 				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Frameworks";
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/../Frameworks @loader_path/Frameworks";
 				PRODUCT_BUNDLE_IDENTIFIER = xyz.crossroadlabs.ExecutionContext;
-				PRODUCT_NAME = "$(TARGET_NAME)";
+				PRODUCT_NAME = "$(PROJECT_NAME)";
 				SKIP_INSTALL = YES;
 			};
 			name = Release;
@@ -442,7 +442,7 @@
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
 		};
-		659E80921C77450200DE85B1 /* Build configuration list for PBXNativeTarget "ExecutionContext" */ = {
+		659E80921C77450200DE85B1 /* Build configuration list for PBXNativeTarget "ExecutionContext-OSX" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				659E80931C77450200DE85B1 /* Debug */,
@@ -451,7 +451,7 @@
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
 		};
-		659E80951C77450200DE85B1 /* Build configuration list for PBXNativeTarget "ExecutionContextTests" */ = {
+		659E80951C77450200DE85B1 /* Build configuration list for PBXNativeTarget "ExecutionContextTests-OSX" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				659E80961C77450200DE85B1 /* Debug */,
