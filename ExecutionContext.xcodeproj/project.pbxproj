@@ -130,7 +130,7 @@
 		659E80F01C78A70700DE85B1 /* Result.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; path = Result.framework; sourceTree = "<group>"; };
 		659E80F11C78A70700DE85B1 /* Result.framework.dSYM */ = {isa = PBXFileReference; lastKnownFileType = wrapper.dsym; path = Result.framework.dSYM; sourceTree = "<group>"; };
 		65FB86981C78AA400005CD1B /* ExecutionContext.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = ExecutionContext.framework; sourceTree = BUILT_PRODUCTS_DIR; };
-		65FB86A11C78AA400005CD1B /* ExecutionContextTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = ExecutionContextTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+		65FB86A11C78AA400005CD1B /* ExecutionContextTests-tvOS.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = "ExecutionContextTests-tvOS.xctest"; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -203,7 +203,7 @@
 				659E80C01C78A47800DE85B1 /* ExecutionContext.framework */,
 				659E80C91C78A47800DE85B1 /* ExecutionContextTests-iOS.xctest */,
 				65FB86981C78AA400005CD1B /* ExecutionContext.framework */,
-				65FB86A11C78AA400005CD1B /* ExecutionContextTests.xctest */,
+				65FB86A11C78AA400005CD1B /* ExecutionContextTests-tvOS.xctest */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -410,9 +410,9 @@
 			productReference = 65FB86981C78AA400005CD1B /* ExecutionContext.framework */;
 			productType = "com.apple.product-type.framework";
 		};
-		65FB86A01C78AA400005CD1B /* ExecutionContextTests */ = {
+		65FB86A01C78AA400005CD1B /* ExecutionContextTests-tvOS */ = {
 			isa = PBXNativeTarget;
-			buildConfigurationList = 65FB86AC1C78AA400005CD1B /* Build configuration list for PBXNativeTarget "ExecutionContextTests" */;
+			buildConfigurationList = 65FB86AC1C78AA400005CD1B /* Build configuration list for PBXNativeTarget "ExecutionContextTests-tvOS" */;
 			buildPhases = (
 				65FB869D1C78AA400005CD1B /* Sources */,
 				65FB869E1C78AA400005CD1B /* Frameworks */,
@@ -424,9 +424,9 @@
 			dependencies = (
 				65FB86A41C78AA400005CD1B /* PBXTargetDependency */,
 			);
-			name = ExecutionContextTests;
+			name = "ExecutionContextTests-tvOS";
 			productName = ExecutionContextTests;
-			productReference = 65FB86A11C78AA400005CD1B /* ExecutionContextTests.xctest */;
+			productReference = 65FB86A11C78AA400005CD1B /* ExecutionContextTests-tvOS.xctest */;
 			productType = "com.apple.product-type.bundle.unit-test";
 		};
 /* End PBXNativeTarget section */
@@ -476,7 +476,7 @@
 				659E80BF1C78A47800DE85B1 /* ExecutionContext-iOS */,
 				659E80C81C78A47800DE85B1 /* ExecutionContextTests-iOS */,
 				65FB86971C78AA400005CD1B /* ExecutionContext-tvOS */,
-				65FB86A01C78AA400005CD1B /* ExecutionContextTests */,
+				65FB86A01C78AA400005CD1B /* ExecutionContextTests-tvOS */,
 			);
 		};
 /* End PBXProject section */
@@ -990,7 +990,7 @@
 			);
 			defaultConfigurationIsVisible = 0;
 		};
-		65FB86AC1C78AA400005CD1B /* Build configuration list for PBXNativeTarget "ExecutionContextTests" */ = {
+		65FB86AC1C78AA400005CD1B /* Build configuration list for PBXNativeTarget "ExecutionContextTests-tvOS" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				65FB86AD1C78AA400005CD1B /* Debug */,
