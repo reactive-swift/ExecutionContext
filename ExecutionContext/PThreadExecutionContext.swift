@@ -57,24 +57,22 @@
 
     private func sourceMain(rls: UnsafeMutablePointer<Void>) {
         let runLoopSource = Unmanaged<RunLoopSource>.fromOpaque(COpaquePointer(rls)).takeUnretainedValue()
+        runLoopSource.cfSource = nil
         runLoopSource.task()
     }
 
     private func sourceCancel(rls: UnsafeMutablePointer<Void>, rL: CFRunLoop!, mode:CFString!) {
         let runLoopSource = Unmanaged<RunLoopSource>.fromOpaque(COpaquePointer(rls)).takeUnretainedValue()
         runLoopSource.cfSource = nil
-        print("cancel")
     }
 
     private func sourceRetain(rls: UnsafePointer<Void>) -> UnsafePointer<Void> {
         Unmanaged<RunLoopSource>.fromOpaque(COpaquePointer(rls)).retain()
-        print("retain")
         return rls
     }
 
     private func sourceRelease(rls: UnsafePointer<Void>) {
         Unmanaged<RunLoopSource>.fromOpaque(COpaquePointer(rls)).release()
-        print("release")
     }
 
     private class RunLoopSource {
