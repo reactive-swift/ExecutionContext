@@ -119,7 +119,8 @@
 				659E808D1C77450200DE85B1 /* ExecutionContextTests.swift */,
 				659E808F1C77450200DE85B1 /* Info.plist */,
 			);
-			path = ExecutionContextTests;
+			name = ExecutionContextTests;
+			path = Tests/ExecutionContext;
 			sourceTree = "<group>";
 		};
 		659E80A61C77467600DE85B1 /* Frameworks */ = {
@@ -407,7 +408,7 @@
 					"$(inherited)",
 					"$(PROJECT_DIR)/Carthage/Build/Mac",
 				);
-				INFOPLIST_FILE = ExecutionContextTests/Info.plist;
+				INFOPLIST_FILE = Tests/ExecutionContext/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/../Frameworks @loader_path/../Frameworks";
 				PRODUCT_BUNDLE_IDENTIFIER = xyz.crossroadlabs.ExecutionContextTests;
 				PRODUCT_NAME = "$(TARGET_NAME)";
@@ -422,7 +423,7 @@
 					"$(inherited)",
 					"$(PROJECT_DIR)/Carthage/Build/Mac",
 				);
-				INFOPLIST_FILE = ExecutionContextTests/Info.plist;
+				INFOPLIST_FILE = Tests/ExecutionContext/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/../Frameworks @loader_path/../Frameworks";
 				PRODUCT_BUNDLE_IDENTIFIER = xyz.crossroadlabs.ExecutionContextTests;
 				PRODUCT_NAME = "$(TARGET_NAME)";
@@ -448,6 +449,7 @@
 				659E80941C77450200DE85B1 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
 		};
 		659E80951C77450200DE85B1 /* Build configuration list for PBXNativeTarget "ExecutionContextTests" */ = {
 			isa = XCConfigurationList;
@@ -456,6 +458,7 @@
 				659E80971C77450200DE85B1 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
 	};
