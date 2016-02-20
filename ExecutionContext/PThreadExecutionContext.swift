@@ -78,9 +78,11 @@
     private class RunLoopSource {
         private var cfSource:CFRunLoopSource? = nil
         private let task:SafeTask
+        private let priority:Int
 
-        init(task: SafeTask) {
+        init(_ task: SafeTask, priority: Int = 0) {
             self.task = task
+            self.priority = priority
         }
 
         deinit {
@@ -103,7 +105,7 @@
                     cancel: sourceCancel,
                     perform: sourceMain
                 )
-                self.cfSource = CFRunLoopSourceCreate(nil, 0, &context)
+                self.cfSource = CFRunLoopSourceCreate(nil, priority, &context)
             }
             
             CFRunLoopAddSource(runLoop, cfSource!, mode)
@@ -150,7 +152,11 @@
         private let rl:CFRunLoop!
         private let ownRunLoop:Bool
 
-        private static let defaultMode = "kCFRunLoopDefaultMode".bridge().cfString
+        #if !os(Linux)
+        private static let defaultMode:CFString = "kCFRunLoopDefaultMode" as NSString
+        #else
+        private static let defaultMode:CFString = "kCFRunLoopDefaultMode".bridge().cfString
+        #endif
         
         override init() {
             ownRunLoop = true
@@ -174,12 +180,25 @@
         }
 
         deinit {
-            if ownRunLoop { CFRunLoopStop(rl) }
+            if ownRunLoop {
+                let runLoop = rl
+                performRunLoopSource(RunLoopSource({
+                        CFRunLoopStop(runLoop)
+                    },
+                    priority: -32768)
+                )
+            }
         }
         
+        #if !os(Linux)
+        static func defaultLoop() {
+            while CFRunLoopRunInMode(defaultMode, 0, true) != .Stopped {}
+        }
+        #else
         static func defaultLoop() {
             while CFRunLoopRunInMode(defaultMode, 0, true) != Int32(kCFRunLoopRunStopped) {}
         }
+        #endif
 
         private func performRunLoopSource(rls: RunLoopSource) {
             rls.addToRunLoop(rl, mode: SerialContext.defaultMode)
@@ -187,7 +206,7 @@
         }
         
         func async(task:SafeTask) {
-            performRunLoopSource(RunLoopSource(task:task))
+            performRunLoopSource(RunLoopSource(task))
         }
         
         func sync<ReturnType>(task:() throws -> ReturnType) throws -> ReturnType {
