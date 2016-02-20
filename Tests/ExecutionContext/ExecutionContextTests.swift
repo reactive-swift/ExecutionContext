@@ -52,7 +52,7 @@ class ExecutionContextTests: XCTestCase {
             expectation.fulfill()
         }
         
-        self.waitForExpectationsWithTimeout(2, handler: nil)
+        self.waitForExpectationsWithTimeout(3, handler: nil)
     }
     
     func afterTestAdvanced(context:ExecutionContextType) {
