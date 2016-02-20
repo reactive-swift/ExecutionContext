@@ -55,20 +55,33 @@
         }
     }
 
-    private func sourceMain(rls: UnsafeMutablePointer<Void>) -> Void {
-            let runLoopSource = Unmanaged<RunLoopSource>.fromOpaque(COpaquePointer(rls)).takeUnretainedValue()
-            runLoopSource.runTask()
+    private func sourceMain(rls: UnsafeMutablePointer<Void>) {
+        let runLoopSource = Unmanaged<RunLoopSource>.fromOpaque(COpaquePointer(rls)).takeUnretainedValue()
+        runLoopSource.task()
     }
 
-    private func sourceRelease(rls: UnsafePointer<Void>) -> Void {
+    private func sourceCancel(rls: UnsafeMutablePointer<Void>, rL: CFRunLoop!, mode:CFString!) {
+        let runLoopSource = Unmanaged<RunLoopSource>.fromOpaque(COpaquePointer(rls)).takeUnretainedValue()
+        runLoopSource.cfSource = nil
+        print("cancel")
+    }
+
+    private func sourceRetain(rls: UnsafePointer<Void>) -> UnsafePointer<Void> {
+        Unmanaged<RunLoopSource>.fromOpaque(COpaquePointer(rls)).retain()
+        print("retain")
+        return rls
+    }
+
+    private func sourceRelease(rls: UnsafePointer<Void>) {
         Unmanaged<RunLoopSource>.fromOpaque(COpaquePointer(rls)).release()
+        print("release")
     }
 
     private class RunLoopSource {
         private var cfSource:CFRunLoopSource? = nil
-        private let task:SafeTask?
+        private let task:SafeTask
 
-        init(task: SafeTask? = nil) {
+        init(task: SafeTask) {
             self.task = task
         }
 
@@ -78,37 +91,30 @@
             }
         }
 
-        private func runTask() {
-            task?()
-            if let s = cfSource {
-                if CFRunLoopSourceIsValid(s) { CFRunLoopSourceInvalidate(s) }
-                cfSource = nil
-            }
-        }
-
         func addToRunLoop(runLoop:CFRunLoop, mode: CFString) {
             if cfSource == nil {
-                if task != nil {
-                    var source = CFRunLoopSourceContext(
-                        version: 0,
-                        info: UnsafeMutablePointer<Void>(Unmanaged.passRetained(self).toOpaque()),
-                        retain: nil,
-                        release: sourceRelease,
-                        copyDescription: nil,
-                        equal: nil,
-                        hash: nil,
-                        schedule: nil,
-                        cancel: nil,
-                        perform: sourceMain
-                    )
-                    self.cfSource = CFRunLoopSourceCreate(nil, 0, &source)
-                } else {
-                    return
-                }
+                var context = CFRunLoopSourceContext(
+                    version: 0,
+                    info: UnsafeMutablePointer<Void>(Unmanaged.passUnretained(self).toOpaque()),
+                    retain: sourceRetain,
+                    release: sourceRelease,
+                    copyDescription: nil,
+                    equal: nil,
+                    hash: nil,
+                    schedule: nil,
+                    cancel: sourceCancel,
+                    perform: sourceMain
+                )
+                self.cfSource = CFRunLoopSourceCreate(nil, 0, &context)
             }
             
             CFRunLoopAddSource(runLoop, cfSource!, mode)
-            CFRunLoopSourceSignal(cfSource!)
+        }
+
+        func signal() {
+            if let s = cfSource {
+                CFRunLoopSourceSignal(s)
+            }
         }
     }
     
@@ -144,9 +150,12 @@
     
     private class SerialContext : ExecutionContextBase, ExecutionContextType {
         private let rl:CFRunLoop!
+        private let ownRunLoop:Bool
+
         private static let defaultMode = "kCFRunLoopDefaultMode".bridge().cfString
         
         override init() {
+            ownRunLoop = true
             var runLoop:CFRunLoop?
             let cond = NSCondition()
             cond.lock()
@@ -162,11 +171,12 @@
         }
         
         init(runLoop:CFRunLoop!) {
+            ownRunLoop = false
             rl = runLoop
         }
 
         deinit {
-            CFRunLoopStop(rl)
+            if ownRunLoop { CFRunLoopStop(rl) }
         }
         
         static func defaultLoop() {
@@ -175,6 +185,7 @@
 
         private func performRunLoopSource(rls: RunLoopSource) {
             rls.addToRunLoop(rl, mode: SerialContext.defaultMode)
+            rls.signal()
         }
         
         func async(task:SafeTask) {
