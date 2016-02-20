@@ -38,6 +38,10 @@ public protocol TaskSchedulerType {
     func async(task:Task)
     func async(task:SafeTask)
     
+    //after is in seconds
+    func async(after:Double, task:Task)
+    func async(after:Double, task:SafeTask)
+    
     func sync<ReturnType>(task:() throws -> ReturnType) throws -> ReturnType
     func sync<ReturnType>(task:() -> ReturnType) -> ReturnType
 }
@@ -75,6 +79,18 @@ public extension ErrorHandlerRegistryType where Self : TaskSchedulerType {
     public func async(task:Task) {
         //specify explicitely, that it's safe task
         async { () -> Void in
+            do {
+                try task()
+            } catch let e {
+                self.handleError(e)
+            }
+        }
+    }
+    
+    //after is in seconds
+    func async(after:Double, task:Task) {
+        //specify explicitely, that it's safe task
+        async(after) { () -> Void in
             do {
                 try task()
             } catch let e {
