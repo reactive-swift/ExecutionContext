@@ -1,0 +1,61 @@
+env:
+  global:
+    - MODULE_NAME=ExecutionContext
+matrix:
+  include:
+    - script:
+        - xcodebuild test -project $MODULE_NAME.xcodeproj -scheme $MODULE_NAME-OSX
+        - xcodebuild test -project $MODULE_NAME.xcodeproj -scheme $MODULE_NAME-iOS -sdk iphonesimulator -destination 'platform=iOS Simulator,name=iPhone 6'
+        - xcodebuild test -project $MODULE_NAME.xcodeproj -scheme $MODULE_NAME-tvOS -sdk appletvsimulator -destination 'platform=tvOS Simulator,name=Apple TV 1080p'
+        - xcodebuild build -project $MODULE_NAME.xcodeproj -scheme $MODULE_NAME-watchOS -sdk watchsimulator -destination 'platform=watchOS Simulator,name=Apple Watch - 42mm'
+      os: osx
+      osx_image: xcode7.2
+      language: objective-c
+      before_install:
+        - brew update
+        - brew unlink carthage
+        - brew install carthage
+        - brew link carthage
+      before_script:
+        # bootstrap the dependencies for the project
+        # you can remove if you don't have dependencies
+        - carthage bootstrap
+      before_deploy:
+        - carthage build --no-skip-current
+        - carthage archive $MODULE_NAME
+        #- pod trunk push CrossroadRegex.podspec
+      deploy:
+        provider: releases
+        file: $MODULE_NAME.framework.zip
+        skip_cleanup: true
+        on:
+          repo: crossroadlabs/ExecutionContext
+          tags: true
+    - script:
+        # build (yes for now swift-build should be like this) 
+        - export SBCMD=`which swift-build`
+        - $SBCMD
+        # test
+        - swift test
+      sudo: required
+      dist: trusty
+      language: generic
+      before_install:
+        # install original swift distribution
+        - wget -q -O - https://swift.org/keys/all-keys.asc | gpg --import -
+        - cd ..
+        - export SWIFT_VERSION=swift-DEVELOPMENT-SNAPSHOT-2016-02-08-a
+        - wget https://swift.org/builds/development/ubuntu1404/$SWIFT_VERSION/$SWIFT_VERSION-ubuntu14.04.tar.gz
+        - tar xzf $SWIFT_VERSION-ubuntu14.04.tar.gz
+        - export PATH="${PWD}/${SWIFT_VERSION}-ubuntu14.04/usr/bin:${PATH}"
+        # install latest package manager with `swift-test`
+        - git clone https://github.com/apple/swift-package-manager
+        - cd swift-package-manager
+        - Utilities/bootstrap
+        - export SWIFT_BUILD_PATH=`pwd`
+        - export PATH=$SWIFT_BUILD_PATH/.build/debug:$PATH
+        - cd ..
+        # get back home
+        - cd $MODULE_NAME
+notifications:
+  email: false
