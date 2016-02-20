@@ -38,7 +38,7 @@ matrix:
         - export SBCMD=`which swift-build`
         - $SBCMD
         # test
-        - swift test
+        #- swift test
       sudo: required
       dist: trusty
       language: generic
