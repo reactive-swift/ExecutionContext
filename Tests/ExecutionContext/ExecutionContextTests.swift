@@ -48,7 +48,6 @@ class ExecutionContextTests: XCTestCase {
         let expectation = self.expectationWithDescription("OK AFTER")
         
         context.async(0.5) {
-            sleep(1)
             expectation.fulfill()
         }
         
