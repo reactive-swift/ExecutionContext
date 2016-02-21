@@ -249,7 +249,7 @@
         #endif
 
         private func performRunLoopObject(rlo: RunLoopObject) {
-            rlo.addToRunLoop(rl, mode: SerialContext.defaultMode)
+            rlo.addToRunLoop(rl, mode: defaultMode)
             rlo.signal()
             CFRunLoopWakeUp(rl)
         }
