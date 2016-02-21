@@ -29,6 +29,10 @@
 		65E646DE1C7994A00036D028 /* CustomExecutionContext.swift in Sources */ = {isa = PBXBuildFile; fileRef = 65E646DC1C79949C0036D028 /* CustomExecutionContext.swift */; };
 		65E646DF1C7994A10036D028 /* CustomExecutionContext.swift in Sources */ = {isa = PBXBuildFile; fileRef = 65E646DC1C79949C0036D028 /* CustomExecutionContext.swift */; };
 		65E646E01C7994A20036D028 /* CustomExecutionContext.swift in Sources */ = {isa = PBXBuildFile; fileRef = 65E646DC1C79949C0036D028 /* CustomExecutionContext.swift */; };
+		65E646F21C79E0590036D028 /* Semaphore.swift in Sources */ = {isa = PBXBuildFile; fileRef = 65E646F11C79E0580036D028 /* Semaphore.swift */; };
+		65E646F31C79E0590036D028 /* Semaphore.swift in Sources */ = {isa = PBXBuildFile; fileRef = 65E646F11C79E0580036D028 /* Semaphore.swift */; };
+		65E646F41C79E0590036D028 /* Semaphore.swift in Sources */ = {isa = PBXBuildFile; fileRef = 65E646F11C79E0580036D028 /* Semaphore.swift */; };
+		65E646F51C79E0590036D028 /* Semaphore.swift in Sources */ = {isa = PBXBuildFile; fileRef = 65E646F11C79E0580036D028 /* Semaphore.swift */; };
 		65FB86901C78A8330005CD1B /* Result.framework in Copy Frameworks */ = {isa = PBXBuildFile; fileRef = 659E80E61C78A70700DE85B1 /* Result.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		65FB86921C78A8D30005CD1B /* Result.framework in Copy Frameworks */ = {isa = PBXBuildFile; fileRef = 659E80E31C78A70700DE85B1 /* Result.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		65FB86A21C78AA400005CD1B /* ExecutionContext.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 65FB86981C78AA400005CD1B /* ExecutionContext.framework */; };
@@ -141,6 +145,7 @@
 		659E80F01C78A70700DE85B1 /* Result.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; path = Result.framework; sourceTree = "<group>"; };
 		659E80F11C78A70700DE85B1 /* Result.framework.dSYM */ = {isa = PBXFileReference; lastKnownFileType = wrapper.dsym; path = Result.framework.dSYM; sourceTree = "<group>"; };
 		65E646DC1C79949C0036D028 /* CustomExecutionContext.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CustomExecutionContext.swift; sourceTree = "<group>"; };
+		65E646F11C79E0580036D028 /* Semaphore.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Semaphore.swift; sourceTree = "<group>"; };
 		65FB86981C78AA400005CD1B /* ExecutionContext.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = ExecutionContext.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		65FB86A11C78AA400005CD1B /* ExecutionContextTests-tvOS.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = "ExecutionContextTests-tvOS.xctest"; sourceTree = BUILT_PRODUCTS_DIR; };
 		65FB86BE1C78AC260005CD1B /* ExecutionContext.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = ExecutionContext.framework; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -240,6 +245,7 @@
 				659E809B1C77457E00DE85B1 /* ImmediateExecutionContext.swift */,
 				65E646DC1C79949C0036D028 /* CustomExecutionContext.swift */,
 				659E809D1C77457E00DE85B1 /* Result+Some.swift */,
+				65E646F11C79E0580036D028 /* Semaphore.swift */,
 				659E80831C77450200DE85B1 /* Info.plist */,
 			);
 			path = ExecutionContext;
@@ -596,6 +602,7 @@
 				659E80A31C77457E00DE85B1 /* Result+Some.swift in Sources */,
 				659E80A11C77457E00DE85B1 /* ImmediateExecutionContext.swift in Sources */,
 				659E809E1C77457E00DE85B1 /* DefaultExecutionContext.swift in Sources */,
+				65E646F21C79E0590036D028 /* Semaphore.swift in Sources */,
 				659E80A21C77457E00DE85B1 /* PThreadExecutionContext.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -618,6 +625,7 @@
 				659E80DC1C78A4BC00DE85B1 /* Result+Some.swift in Sources */,
 				659E80DB1C78A4B800DE85B1 /* ImmediateExecutionContext.swift in Sources */,
 				659E80D71C78A4AB00DE85B1 /* ExecutionContext.swift in Sources */,
+				65E646F31C79E0590036D028 /* Semaphore.swift in Sources */,
 				659E80D91C78A4B200DE85B1 /* DispatchExecutionContext.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -640,6 +648,7 @@
 				65FB86B41C78AAE50005CD1B /* Result+Some.swift in Sources */,
 				65FB86B31C78AAE50005CD1B /* ImmediateExecutionContext.swift in Sources */,
 				65FB86AF1C78AADB0005CD1B /* ExecutionContext.swift in Sources */,
+				65E646F41C79E0590036D028 /* Semaphore.swift in Sources */,
 				65FB86B11C78AAE50005CD1B /* DispatchExecutionContext.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -662,6 +671,7 @@
 				65FB86CB1C78AC8B0005CD1B /* Result+Some.swift in Sources */,
 				65FB86CA1C78AC8B0005CD1B /* ImmediateExecutionContext.swift in Sources */,
 				65FB86C61C78AC8B0005CD1B /* ExecutionContext.swift in Sources */,
+				65E646F51C79E0590036D028 /* Semaphore.swift in Sources */,
 				65FB86C81C78AC8B0005CD1B /* DispatchExecutionContext.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;

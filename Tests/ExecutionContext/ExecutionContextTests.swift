@@ -37,7 +37,7 @@ class ExecutionContextTests: XCTestCase {
         let expectation = self.expectationWithDescription("OK ASYNC")
         
         context.async {
-            sleep(1)
+            sleep(1.0)
             expectation.fulfill()
         }
         
@@ -61,11 +61,11 @@ class ExecutionContextTests: XCTestCase {
             ok = false
         }
         
-        sleep(2)
+        sleep(2.0)
         
         XCTAssert(ok)
         
-        sleep(2)
+        sleep(2.0)
         
         XCTAssertFalse(ok)
     }
@@ -133,6 +133,20 @@ class ExecutionContextTests: XCTestCase {
         asyncTest(context)
         afterTest(context)
         //afterTestAdvanced - no it will not work here
+    }
+    
+    func testSemaphore() {
+        let sema = Semaphore()
+        var n = 0
+        for _ in [0...100] {
+            global.execute {
+                sema.wait()
+                n += 1
+                sleep(0.1)
+                n -= 1
+                sema.signal()
+            }
+        }
     }
 }
 
