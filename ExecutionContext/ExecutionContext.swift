@@ -15,6 +15,7 @@
 //===----------------------------------------------------------------------===//
 
 import Foundation
+import CoreFoundation
 import Result
 
 public typealias Task = () throws -> Void
