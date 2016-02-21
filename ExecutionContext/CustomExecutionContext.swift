@@ -28,12 +28,8 @@ public class CustomExecutionContext : ExecutionContextBase, ExecutionContextType
     }
     
     public func async(after:Double, task:SafeTask) {
-        let sec = time_t(after)
-        let nsec = Int((after - Double(sec)) * 1000 * 1000 * 1000)//nano seconds
-        var time = timespec(tv_sec:sec, tv_nsec: nsec)
-        
         async {
-            nanosleep(&time, nil)
+            sleep(after)
             task()
         }
     }

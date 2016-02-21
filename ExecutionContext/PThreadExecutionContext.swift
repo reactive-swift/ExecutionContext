@@ -196,11 +196,7 @@
         
         func async(after:Double, task:SafeTask) {
             let thread = PThread(task: {
-                let sec = time_t(after)
-                let nsec = Int((after - Double(sec)) * 1000 * 1000 * 1000)//nano seconds
-                var time = timespec(tv_sec:sec, tv_nsec: nsec)
-                
-                nanosleep(&time, nil)
+                sleep(after)
                 task()
             })
             thread.start()

@@ -22,12 +22,10 @@ public class ImmediateExecutionContext : ExecutionContextBase, ExecutionContextT
     }
     
     public func async(after:Double, task:SafeTask) {
-        let sec = time_t(after)
-        let nsec = Int((after - Double(sec)) * 1000 * 1000 * 1000)//nano seconds
-        var time = timespec(tv_sec:sec, tv_nsec: nsec)
-        
-        nanosleep(&time, nil)
-        async(task)
+        async {
+            sleep(after)
+            task()
+        }
     }
     
     public func sync<ReturnType>(task:() throws -> ReturnType) throws -> ReturnType {
