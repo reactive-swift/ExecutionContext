@@ -14,9 +14,9 @@
             buildForAnalyzing = "YES">
             <BuildableReference
                BuildableIdentifier = "primary"
-               BlueprintIdentifier = "659E807D1C77450200DE85B1"
+               BlueprintIdentifier = "65FB86BD1C78AC260005CD1B"
                BuildableName = "ExecutionContext.framework"
-               BlueprintName = "ExecutionContext"
+               BlueprintName = "ExecutionContext-watchOS"
                ReferencedContainer = "container:ExecutionContext.xcodeproj">
             </BuildableReference>
          </BuildActionEntry>
@@ -28,26 +28,7 @@
       selectedLauncherIdentifier = "Xcode.DebuggerFoundation.Launcher.LLDB"
       shouldUseLaunchSchemeArgsEnv = "YES">
       <Testables>
-         <TestableReference
-            skipped = "NO">
-            <BuildableReference
-               BuildableIdentifier = "primary"
-               BlueprintIdentifier = "659E80871C77450200DE85B1"
-               BuildableName = "ExecutionContextTests.xctest"
-               BlueprintName = "ExecutionContextTests"
-               ReferencedContainer = "container:ExecutionContext.xcodeproj">
-            </BuildableReference>
-         </TestableReference>
       </Testables>
-      <MacroExpansion>
-         <BuildableReference
-            BuildableIdentifier = "primary"
-            BlueprintIdentifier = "659E807D1C77450200DE85B1"
-            BuildableName = "ExecutionContext.framework"
-            BlueprintName = "ExecutionContext"
-            ReferencedContainer = "container:ExecutionContext.xcodeproj">
-         </BuildableReference>
-      </MacroExpansion>
       <AdditionalOptions>
       </AdditionalOptions>
    </TestAction>
@@ -64,9 +45,9 @@
       <MacroExpansion>
          <BuildableReference
             BuildableIdentifier = "primary"
-            BlueprintIdentifier = "659E807D1C77450200DE85B1"
+            BlueprintIdentifier = "65FB86BD1C78AC260005CD1B"
             BuildableName = "ExecutionContext.framework"
-            BlueprintName = "ExecutionContext"
+            BlueprintName = "ExecutionContext-watchOS"
             ReferencedContainer = "container:ExecutionContext.xcodeproj">
          </BuildableReference>
       </MacroExpansion>
@@ -82,9 +63,9 @@
       <MacroExpansion>
          <BuildableReference
             BuildableIdentifier = "primary"
-            BlueprintIdentifier = "659E807D1C77450200DE85B1"
+            BlueprintIdentifier = "65FB86BD1C78AC260005CD1B"
             BuildableName = "ExecutionContext.framework"
-            BlueprintName = "ExecutionContext"
+            BlueprintName = "ExecutionContext-watchOS"
             ReferencedContainer = "container:ExecutionContext.xcodeproj">
          </BuildableReference>
       </MacroExpansion>

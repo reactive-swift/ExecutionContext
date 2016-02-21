@@ -1,4 +1,4 @@
-//===--- ImmediateExecutionContext.swift ------------------------------------------------------===//
+//===--- CustomExecutionContext.swift ------------------------------------------------------===//
 //Copyright (c) 2016 Daniel Leping (dileping)
 //
 //Licensed under the Apache License, Version 2.0 (the "License");
@@ -16,9 +16,15 @@
 
 import Foundation
 
-public class ImmediateExecutionContext : ExecutionContextBase, ExecutionContextType {
+public class CustomExecutionContext : ExecutionContextBase, ExecutionContextType {
+    let executor:Executor
+    
+    public init(executor:Executor) {
+        self.executor = executor
+    }
+    
     public func async(task:SafeTask) {
-        task()
+        executor(task)
     }
     
     public func async(after:Double, task:SafeTask) {
@@ -29,6 +35,6 @@ public class ImmediateExecutionContext : ExecutionContextBase, ExecutionContextT
     }
     
     public func sync<ReturnType>(task:() throws -> ReturnType) throws -> ReturnType {
-        return try task()
+        return try syncThroughAsync(task)
     }
 }

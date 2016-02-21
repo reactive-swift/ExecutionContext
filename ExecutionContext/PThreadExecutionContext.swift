@@ -188,25 +188,6 @@
         }
     }
     
-    private extension ExecutionContextType {
-        func syncThroughAsync<ReturnType>(task:() throws -> ReturnType) throws -> ReturnType {
-            var result:Result<ReturnType, AnyError>?
-            
-            let cond = NSCondition()
-            cond.lock()
-
-            async {
-                result = materialize(task)
-                cond.signal()
-            }
-            
-            cond.wait()
-            cond.unlock()
-            
-            return try result!.dematerializeAnyError()
-        }
-    }
-    
     private class ParallelContext : ExecutionContextBase, ExecutionContextType {
         func async(task:SafeTask) {
             let thread = PThread(task: task)
@@ -215,11 +196,7 @@
         
         func async(after:Double, task:SafeTask) {
             let thread = PThread(task: {
-                let sec = time_t(after)
-                let nsec = Int((after - Double(sec)) * 1000 * 1000 * 1000)//nano seconds
-                var time = timespec(tv_sec:sec, tv_nsec: nsec)
-                
-                nanosleep(&time, nil)
+                sleep(after)
                 task()
             })
             thread.start()
@@ -230,15 +207,15 @@
         }
     }
     
+#if !os(Linux)
+    let defaultMode:CFString = "kCFRunLoopDefaultMode" as NSString
+#else
+    let defaultMode:CFString = "kCFRunLoopDefaultMode".bridge().cfString
+#endif
+    
     private class SerialContext : ExecutionContextBase, ExecutionContextType {
         private let rl:CFRunLoop!
         private let finalizer: RunLoopFinalizer?
-
-        #if !os(Linux)
-        private static let defaultMode:CFString = "kCFRunLoopDefaultMode" as NSString
-        #else
-        private static let defaultMode:CFString = "kCFRunLoopDefaultMode".bridge().cfString
-        #endif
         
         override init() {
             var runLoop:CFRunLoop?
@@ -272,7 +249,7 @@
         #endif
 
         private func performRunLoopObject(rlo: RunLoopObject) {
-            rlo.addToRunLoop(rl, mode: SerialContext.defaultMode)
+            rlo.addToRunLoop(rl, mode: defaultMode)
             rlo.signal()
             CFRunLoopWakeUp(rl)
         }

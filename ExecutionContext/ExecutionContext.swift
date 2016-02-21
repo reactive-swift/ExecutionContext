@@ -15,6 +15,8 @@
 //===----------------------------------------------------------------------===//
 
 import Foundation
+import CoreFoundation
+import Result
 
 public typealias Task = () throws -> Void
 public typealias SafeTask = () -> Void
@@ -47,7 +49,16 @@ public protocol TaskSchedulerType {
 }
 
 public protocol ExecutionContextType : TaskSchedulerType, ErrorHandlerRegistryType {
+    func execute(task:SafeTask)
 }
+
+public extension ExecutionContextType {
+    func execute(task:SafeTask) {
+        async(task)
+    }
+}
+
+public typealias Executor = (SafeTask)->Void
 
 public class ExecutionContextBase : ErrorHandlerRegistryType {
     public var errorHandlers = [ErrorHandler]()
@@ -115,6 +126,55 @@ public enum ExecutionContextKind {
 
 public typealias ExecutionContext = DefaultExecutionContext
 
-public let immediate = ImmediateExecutionContext()
-public let main = ExecutionContext.main
-public let global = ExecutionContext.global
+extension ExecutionContextType {
+    func syncThroughAsync<ReturnType>(task:() throws -> ReturnType) throws -> ReturnType {
+        var result:Result<ReturnType, AnyError>?
+        
+        let cond = NSCondition()
+        var done = false
+        
+        async {
+            defer {
+                cond.lock()
+                done = true
+                cond.signal()
+                cond.unlock()
+            }
+            result = materialize(task)
+        }
+        
+        cond.lock()
+        while !done {
+            cond.wait()
+        }
+        cond.unlock()
+        
+        return try result!.dematerializeAnyError()
+    }
+}
+
+public let immediate:ExecutionContextType = ImmediateExecutionContext()
+public let main:ExecutionContextType = ExecutionContext.main
+public let global:ExecutionContextType = ExecutionContext.global
+
+public func executionContext(executor:Executor) -> ExecutionContextType {
+    return CustomExecutionContext(executor: executor)
+}
+
+public func sleep(timeout:Double) {
+    let sec = time_t(timeout)
+    let nsec = Int((timeout - Double(sec)) * 1000 * 1000 * 1000)//nano seconds
+    var time = timespec(tv_sec:sec, tv_nsec: nsec)
+    
+    nanosleep(&time, nil)
+}
+
+@noreturn public func executionContextMain() {
+    #if os(Linux)
+        while true {
+            CFRunLoopRunInMode(defaultMode, 0, true)
+        }
+    #else
+        dispatch_main()
+    #endif
+}

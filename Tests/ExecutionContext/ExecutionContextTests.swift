@@ -37,7 +37,7 @@ class ExecutionContextTests: XCTestCase {
         let expectation = self.expectationWithDescription("OK ASYNC")
         
         context.async {
-            sleep(1)
+            sleep(1.0)
             expectation.fulfill()
         }
         
@@ -48,11 +48,10 @@ class ExecutionContextTests: XCTestCase {
         let expectation = self.expectationWithDescription("OK AFTER")
         
         context.async(0.5) {
-            sleep(1)
             expectation.fulfill()
         }
         
-        self.waitForExpectationsWithTimeout(2, handler: nil)
+        self.waitForExpectationsWithTimeout(3, handler: nil)
     }
     
     func afterTestAdvanced(context:ExecutionContextType) {
@@ -62,11 +61,11 @@ class ExecutionContextTests: XCTestCase {
             ok = false
         }
         
-        sleep(2)
+        sleep(2.0)
         
         XCTAssert(ok)
         
-        sleep(2)
+        sleep(2.0)
         
         XCTAssertFalse(ok)
     }
@@ -106,6 +105,50 @@ class ExecutionContextTests: XCTestCase {
         afterTest(context)
         //afterTestAdvanced - no it will not work here
     }
+    
+    func testCustomOnGlobal() {
+        let context = executionContext(global.execute)
+        
+        syncTest(context)
+        asyncTest(context)
+        afterTest(context)
+        afterTestAdvanced(context)
+    }
+    
+    func testCustomOnMain() {
+        let context = executionContext(global.execute)
+        
+        syncTest(context)
+        asyncTest(context)
+        afterTest(context)
+        //afterTestAdvanced - no it will not work here
+    }
+    
+    func testCustomSimple() {
+        let context = executionContext { task in
+            task()
+        }
+        
+        syncTest(context)
+        asyncTest(context)
+        afterTest(context)
+        //afterTestAdvanced - no it will not work here
+    }
+    
+    func testSemaphore() {
+        let sema = Semaphore()
+        var n = 0
+        for _ in [0...100] {
+            global.execute {
+                sema.wait()
+                XCTAssert(n == 0, "Should always be zero")
+                n += 1
+                sleep(0.1)
+                n -= 1
+                sema.signal()
+            }
+        }
+    }
 }
 
 #if os(Linux)
@@ -115,7 +158,10 @@ extension ExecutionContextTests : XCTestCaseProvider {
             ("testSerial", testSerial),
             ("testParallel", testParallel),
             ("testGlobal", testGlobal),
-            ("testMain", testMain)
+            ("testMain", testMain),
+            ("testMain", testCustomOnGlobal),
+            ("testMain", testCustomOnMain),
+            ("testMain", testCustomSimple)
         ]
     }
 }
