@@ -208,9 +208,9 @@
     }
     
 #if !os(Linux)
-    private let defaultMode:CFString = "kCFRunLoopDefaultMode" as NSString
+    let defaultMode:CFString = "kCFRunLoopDefaultMode" as NSString
 #else
-    private let defaultMode:CFString = "kCFRunLoopDefaultMode".bridge().cfString
+    let defaultMode:CFString = "kCFRunLoopDefaultMode".bridge().cfString
 #endif
     
     private class SerialContext : ExecutionContextBase, ExecutionContextType {
