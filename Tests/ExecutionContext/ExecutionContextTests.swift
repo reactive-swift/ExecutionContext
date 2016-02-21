@@ -141,6 +141,7 @@ class ExecutionContextTests: XCTestCase {
         for _ in [0...100] {
             global.execute {
                 sema.wait()
+                XCTAssert(n == 0, "Should always be zero")
                 n += 1
                 sleep(0.1)
                 n -= 1
