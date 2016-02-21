@@ -15,7 +15,7 @@
             <BuildableReference
                BuildableIdentifier = "primary"
                BlueprintIdentifier = "65FB86BD1C78AC260005CD1B"
-               BuildableName = "ExecutionContext-watchOS.framework"
+               BuildableName = "ExecutionContext.framework"
                BlueprintName = "ExecutionContext-watchOS"
                ReferencedContainer = "container:ExecutionContext.xcodeproj">
             </BuildableReference>
@@ -46,7 +46,7 @@
          <BuildableReference
             BuildableIdentifier = "primary"
             BlueprintIdentifier = "65FB86BD1C78AC260005CD1B"
-            BuildableName = "ExecutionContext-watchOS.framework"
+            BuildableName = "ExecutionContext.framework"
             BlueprintName = "ExecutionContext-watchOS"
             ReferencedContainer = "container:ExecutionContext.xcodeproj">
          </BuildableReference>
@@ -64,7 +64,7 @@
          <BuildableReference
             BuildableIdentifier = "primary"
             BlueprintIdentifier = "65FB86BD1C78AC260005CD1B"
-            BuildableName = "ExecutionContext-watchOS.framework"
+            BuildableName = "ExecutionContext.framework"
             BlueprintName = "ExecutionContext-watchOS"
             ReferencedContainer = "container:ExecutionContext.xcodeproj">
          </BuildableReference>
