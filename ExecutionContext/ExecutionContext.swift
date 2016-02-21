@@ -159,3 +159,11 @@ public let global:ExecutionContextType = ExecutionContext.global
 public func executionContext(executor:Executor) -> ExecutionContextType {
     return CustomExecutionContext(executor: executor)
 }
+
+public func sleep(timeout:Double) {
+    let sec = time_t(timeout)
+    let nsec = Int((timeout - Double(sec)) * 1000 * 1000 * 1000)//nano seconds
+    var time = timespec(tv_sec:sec, tv_nsec: nsec)
+    
+    nanosleep(&time, nil)
+}
