@@ -16,7 +16,7 @@
 
 import Foundation
 
-public class ImmediateExecutionContext : ExecutionContextBase, TaskSchedulerType {
+public class ImmediateExecutionContext : ExecutionContextBase, ExecutionContextType {
     public func async(task:SafeTask) {
         task()
     }

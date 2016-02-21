@@ -124,6 +124,6 @@ public enum ExecutionContextKind {
 
 public typealias ExecutionContext = DefaultExecutionContext
 
-public let immediate = ImmediateExecutionContext()
-public let main = ExecutionContext.main
-public let global = ExecutionContext.global
+public let immediate:ExecutionContextType = ImmediateExecutionContext()
+public let main:ExecutionContextType = ExecutionContext.main
+public let global:ExecutionContextType = ExecutionContext.global
