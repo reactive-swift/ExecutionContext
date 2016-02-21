@@ -167,3 +167,13 @@ public func sleep(timeout:Double) {
     
     nanosleep(&time, nil)
 }
+
+@noreturn public func executionContextMain() {
+    #if os(Linux)
+        while true {
+            CFRunLoopRunInMode(defaultMode, 0, true)
+        }
+    #else
+        dispatch_main()
+    #endif
+}
