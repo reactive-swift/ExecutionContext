@@ -15,6 +15,7 @@
 //===----------------------------------------------------------------------===//
 
 import Foundation
+import Result
 
 public typealias Task = () throws -> Void
 public typealias SafeTask = () -> Void
@@ -124,6 +125,37 @@ public enum ExecutionContextKind {
 
 public typealias ExecutionContext = DefaultExecutionContext
 
+extension ExecutionContextType {
+    func syncThroughAsync<ReturnType>(task:() throws -> ReturnType) throws -> ReturnType {
+        var result:Result<ReturnType, AnyError>?
+        
+        let cond = NSCondition()
+        var done = false
+        
+        async {
+            defer {
+                cond.lock()
+                done = true
+                cond.signal()
+                cond.unlock()
+            }
+            result = materialize(task)
+        }
+        
+        cond.lock()
+        while !done {
+            cond.wait()
+        }
+        cond.unlock()
+        
+        return try result!.dematerializeAnyError()
+    }
+}
+
 public let immediate:ExecutionContextType = ImmediateExecutionContext()
 public let main:ExecutionContextType = ExecutionContext.main
 public let global:ExecutionContextType = ExecutionContext.global
+
+public func executionContext(executor:Executor) -> ExecutionContextType {
+    return CustomExecutionContext(executor: executor)
+}

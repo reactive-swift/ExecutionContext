@@ -25,6 +25,10 @@
 		659E80DD1C78A4F000DE85B1 /* ExecutionContextTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 659E808D1C77450200DE85B1 /* ExecutionContextTests.swift */; };
 		659E81121C78A71F00DE85B1 /* Result.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 659E80E31C78A70700DE85B1 /* Result.framework */; };
 		659E81131C78A72C00DE85B1 /* Result.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 659E80E61C78A70700DE85B1 /* Result.framework */; };
+		65E646DD1C79949C0036D028 /* CustomExecutionContext.swift in Sources */ = {isa = PBXBuildFile; fileRef = 65E646DC1C79949C0036D028 /* CustomExecutionContext.swift */; };
+		65E646DE1C7994A00036D028 /* CustomExecutionContext.swift in Sources */ = {isa = PBXBuildFile; fileRef = 65E646DC1C79949C0036D028 /* CustomExecutionContext.swift */; };
+		65E646DF1C7994A10036D028 /* CustomExecutionContext.swift in Sources */ = {isa = PBXBuildFile; fileRef = 65E646DC1C79949C0036D028 /* CustomExecutionContext.swift */; };
+		65E646E01C7994A20036D028 /* CustomExecutionContext.swift in Sources */ = {isa = PBXBuildFile; fileRef = 65E646DC1C79949C0036D028 /* CustomExecutionContext.swift */; };
 		65FB86901C78A8330005CD1B /* Result.framework in Copy Frameworks */ = {isa = PBXBuildFile; fileRef = 659E80E61C78A70700DE85B1 /* Result.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		65FB86921C78A8D30005CD1B /* Result.framework in Copy Frameworks */ = {isa = PBXBuildFile; fileRef = 659E80E31C78A70700DE85B1 /* Result.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		65FB86A21C78AA400005CD1B /* ExecutionContext.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 65FB86981C78AA400005CD1B /* ExecutionContext.framework */; };
@@ -136,6 +140,7 @@
 		659E80EF1C78A70700DE85B1 /* B2361319-6010-3366-BA4B-B28167D21368.bcsymbolmap */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = "B2361319-6010-3366-BA4B-B28167D21368.bcsymbolmap"; sourceTree = "<group>"; };
 		659E80F01C78A70700DE85B1 /* Result.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; path = Result.framework; sourceTree = "<group>"; };
 		659E80F11C78A70700DE85B1 /* Result.framework.dSYM */ = {isa = PBXFileReference; lastKnownFileType = wrapper.dsym; path = Result.framework.dSYM; sourceTree = "<group>"; };
+		65E646DC1C79949C0036D028 /* CustomExecutionContext.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CustomExecutionContext.swift; sourceTree = "<group>"; };
 		65FB86981C78AA400005CD1B /* ExecutionContext.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = ExecutionContext.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		65FB86A11C78AA400005CD1B /* ExecutionContextTests-tvOS.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = "ExecutionContextTests-tvOS.xctest"; sourceTree = BUILT_PRODUCTS_DIR; };
 		65FB86BE1C78AC260005CD1B /* ExecutionContext.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = ExecutionContext.framework; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -233,6 +238,7 @@
 				659E80991C77457E00DE85B1 /* DispatchExecutionContext.swift */,
 				659E809C1C77457E00DE85B1 /* PThreadExecutionContext.swift */,
 				659E809B1C77457E00DE85B1 /* ImmediateExecutionContext.swift */,
+				65E646DC1C79949C0036D028 /* CustomExecutionContext.swift */,
 				659E809D1C77457E00DE85B1 /* Result+Some.swift */,
 				659E80831C77450200DE85B1 /* Info.plist */,
 			);
@@ -586,6 +592,7 @@
 			files = (
 				659E809F1C77457E00DE85B1 /* DispatchExecutionContext.swift in Sources */,
 				659E80A01C77457E00DE85B1 /* ExecutionContext.swift in Sources */,
+				65E646DD1C79949C0036D028 /* CustomExecutionContext.swift in Sources */,
 				659E80A31C77457E00DE85B1 /* Result+Some.swift in Sources */,
 				659E80A11C77457E00DE85B1 /* ImmediateExecutionContext.swift in Sources */,
 				659E809E1C77457E00DE85B1 /* DefaultExecutionContext.swift in Sources */,
@@ -607,6 +614,7 @@
 			files = (
 				659E80D81C78A4AF00DE85B1 /* DefaultExecutionContext.swift in Sources */,
 				659E80DA1C78A4B500DE85B1 /* PThreadExecutionContext.swift in Sources */,
+				65E646DE1C7994A00036D028 /* CustomExecutionContext.swift in Sources */,
 				659E80DC1C78A4BC00DE85B1 /* Result+Some.swift in Sources */,
 				659E80DB1C78A4B800DE85B1 /* ImmediateExecutionContext.swift in Sources */,
 				659E80D71C78A4AB00DE85B1 /* ExecutionContext.swift in Sources */,
@@ -628,6 +636,7 @@
 			files = (
 				65FB86B01C78AAE00005CD1B /* DefaultExecutionContext.swift in Sources */,
 				65FB86B21C78AAE50005CD1B /* PThreadExecutionContext.swift in Sources */,
+				65E646DF1C7994A10036D028 /* CustomExecutionContext.swift in Sources */,
 				65FB86B41C78AAE50005CD1B /* Result+Some.swift in Sources */,
 				65FB86B31C78AAE50005CD1B /* ImmediateExecutionContext.swift in Sources */,
 				65FB86AF1C78AADB0005CD1B /* ExecutionContext.swift in Sources */,
@@ -649,6 +658,7 @@
 			files = (
 				65FB86C71C78AC8B0005CD1B /* DefaultExecutionContext.swift in Sources */,
 				65FB86C91C78AC8B0005CD1B /* PThreadExecutionContext.swift in Sources */,
+				65E646E01C7994A20036D028 /* CustomExecutionContext.swift in Sources */,
 				65FB86CB1C78AC8B0005CD1B /* Result+Some.swift in Sources */,
 				65FB86CA1C78AC8B0005CD1B /* ImmediateExecutionContext.swift in Sources */,
 				65FB86C61C78AC8B0005CD1B /* ExecutionContext.swift in Sources */,
@@ -1104,6 +1114,7 @@
 				65FB86AB1C78AA400005CD1B /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
 		};
 		65FB86AC1C78AA400005CD1B /* Build configuration list for PBXNativeTarget "ExecutionContextTests-tvOS" */ = {
 			isa = XCConfigurationList;
@@ -1112,6 +1123,7 @@
 				65FB86AE1C78AA400005CD1B /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
 		};
 		65FB86C31C78AC260005CD1B /* Build configuration list for PBXNativeTarget "ExecutionContext-watchOS" */ = {
 			isa = XCConfigurationList;
@@ -1120,6 +1132,7 @@
 				65FB86C51C78AC260005CD1B /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
 	};

@@ -105,6 +105,35 @@ class ExecutionContextTests: XCTestCase {
         afterTest(context)
         //afterTestAdvanced - no it will not work here
     }
+    
+    func testCustomOnGlobal() {
+        let context = executionContext(global.execute)
+        
+        syncTest(context)
+        asyncTest(context)
+        afterTest(context)
+        afterTestAdvanced(context)
+    }
+    
+    func testCustomOnMain() {
+        let context = executionContext(global.execute)
+        
+        syncTest(context)
+        asyncTest(context)
+        afterTest(context)
+        //afterTestAdvanced - no it will not work here
+    }
+    
+    func testCustomSimple() {
+        let context = executionContext { task in
+            task()
+        }
+        
+        syncTest(context)
+        asyncTest(context)
+        afterTest(context)
+        //afterTestAdvanced - no it will not work here
+    }
 }
 
 #if os(Linux)
@@ -114,7 +143,10 @@ extension ExecutionContextTests : XCTestCaseProvider {
             ("testSerial", testSerial),
             ("testParallel", testParallel),
             ("testGlobal", testGlobal),
-            ("testMain", testMain)
+            ("testMain", testMain),
+            ("testMain", testCustomOnGlobal),
+            ("testMain", testCustomOnMain),
+            ("testMain", testCustomSimple)
         ]
     }
 }

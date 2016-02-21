@@ -188,25 +188,6 @@
         }
     }
     
-    private extension ExecutionContextType {
-        func syncThroughAsync<ReturnType>(task:() throws -> ReturnType) throws -> ReturnType {
-            var result:Result<ReturnType, AnyError>?
-            
-            let cond = NSCondition()
-            cond.lock()
-
-            async {
-                result = materialize(task)
-                cond.signal()
-            }
-            
-            cond.wait()
-            cond.unlock()
-            
-            return try result!.dematerializeAnyError()
-        }
-    }
-    
     private class ParallelContext : ExecutionContextBase, ExecutionContextType {
         func async(task:SafeTask) {
             let thread = PThread(task: task)
