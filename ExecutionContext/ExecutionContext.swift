@@ -47,7 +47,16 @@ public protocol TaskSchedulerType {
 }
 
 public protocol ExecutionContextType : TaskSchedulerType, ErrorHandlerRegistryType {
+    func execute(task:SafeTask)
 }
+
+public extension ExecutionContextType {
+    func execute(task:SafeTask) {
+        async(task)
+    }
+}
+
+public typealias Executor = (SafeTask)->Void
 
 public class ExecutionContextBase : ErrorHandlerRegistryType {
     public var errorHandlers = [ErrorHandler]()
