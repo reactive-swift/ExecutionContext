@@ -161,9 +161,9 @@ public func sleep(timeout:Double) {
 }
 
 @noreturn public func executionContextMain() {
-    #if os(Linux)
+    //#if os(Linux)
         RunLoop.runForever()
-    #else
-        dispatch_main()
-    #endif
+    //#else
+    //    dispatch_main()
+    //#endif
 }
