@@ -51,7 +51,6 @@ public class Semaphore {
     public func wait(until:NSDate? = nil) -> Bool {
         underlyingSemaphore.lock()
         defer {
-            value -= 1
             underlyingSemaphore.unlock()
         }
         
@@ -61,6 +60,10 @@ public class Semaphore {
             if !signaled {
                 break
             }
+        }
+        
+        if signaled {
+            value -= 1
         }
         
         return signaled
