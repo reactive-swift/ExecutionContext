@@ -52,27 +52,33 @@ import CoreFoundation
 
 	private protocol RunLoopCallback {
 		var info : RunLoopCallbackInfo { get }
-		var cfObject: AnyObject { get }
+		var cfObject: AnyObject { mutating get }
 	}
 
 	struct RunLoopSource : RunLoopCallback {
 		private let info : RunLoopCallbackInfo
 		private let priority : Int
+        private var _source: CFRunLoopSource! = nil
 
 		private var cfObject : AnyObject {
-			var context = CFRunLoopSourceContext(
-                version: 0,
-                info: UnsafeMutablePointer<Void>(Unmanaged.passUnretained(info).toOpaque()),
-                retain: runLoopCallbackInfoRetain,
-                release: runLoopCallbackInfoRelease,
-                copyDescription: nil,
-                equal: nil,
-                hash: nil,
-                schedule: nil,
-                cancel: nil,
-                perform: runLoopCallbackInfoRun
-            )
-            return CFRunLoopSourceCreate(nil, priority, &context)
+            mutating get {
+                if _source == nil {
+                    var context = CFRunLoopSourceContext(
+                        version: 0,
+                        info: UnsafeMutablePointer<Void>(Unmanaged.passUnretained(info).toOpaque()),
+                        retain: runLoopCallbackInfoRetain,
+                        release: runLoopCallbackInfoRelease,
+                        copyDescription: nil,
+                        equal: nil,
+                        hash: nil,
+                        schedule: nil,
+                        cancel: nil,
+                        perform: runLoopCallbackInfoRun
+                    )
+                    _source = CFRunLoopSourceCreate(nil, priority, &context)
+                }
+                return _source
+            }
 		}
 
 		init(_ task: SafeTask, priority: Int = 0) {
@@ -88,16 +94,22 @@ import CoreFoundation
 	struct RunLoopDelay : RunLoopCallback {
 		private let info : RunLoopCallbackInfo
 		private let delay: Double
+        private var _timer: CFRunLoopTimer! = nil
 
 		private var cfObject : AnyObject {
-			var context = CFRunLoopTimerContext(
-                version: 0,
-                info: UnsafeMutablePointer<Void>(Unmanaged.passUnretained(info).toOpaque()),
-                retain: runLoopCallbackInfoRetain,
-                release: runLoopCallbackInfoRelease,
-                copyDescription: nil
-            )
-            return CFRunLoopTimerCreate(nil, CFAbsoluteTimeGetCurrent()+delay, -1, 0, 0, timerRunCallback, &context)
+            mutating get {
+                if _timer == nil {
+                    var context = CFRunLoopTimerContext(
+                        version: 0,
+                        info: UnsafeMutablePointer<Void>(Unmanaged.passUnretained(info).toOpaque()),
+                        retain: runLoopCallbackInfoRetain,
+                        release: runLoopCallbackInfoRelease,
+                        copyDescription: nil
+                    )
+                    _timer = CFRunLoopTimerCreate(nil, CFAbsoluteTimeGetCurrent()+delay, -1, 0, 0, timerRunCallback, &context)
+                }
+                return _timer
+            }
 		}
 		
 		init(_ task: SafeTask, delay: Double) {
@@ -155,14 +167,14 @@ import CoreFoundation
 			while true { run() }
 		}
 
-		func addSource(rls: RunLoopSource, mode: NSString) {
+		func addSource(var rls: RunLoopSource, mode: NSString) {
 			rls.info.runLoops.append(self)
 			CFRunLoopAddSource(cfRunLoop, unsafeBitCast(rls.cfObject, CFRunLoopSource.self), mode.cfString)
 			CFRunLoopSourceSignal(unsafeBitCast(rls.cfObject, CFRunLoopSource.self))
 			CFRunLoopWakeUp(cfRunLoop)
 		}
 
-		func addDelay(rld: RunLoopDelay, mode: NSString) {
+		func addDelay(var rld: RunLoopDelay, mode: NSString) {
 			rld.info.runLoops.append(self)
 			CFRunLoopAddTimer(cfRunLoop, unsafeBitCast(rld.cfObject, CFRunLoopTimer.self), mode.cfString)
 			CFRunLoopWakeUp(cfRunLoop)
