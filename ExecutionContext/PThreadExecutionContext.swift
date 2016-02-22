@@ -17,7 +17,7 @@
 //////////////////////////////////////////////////////////////////////////
 //This file is a temporary solution, just until Dispatch will run on Mac//
 //////////////////////////////////////////////////////////////////////////
-#if os(Linux)
+//#if os(Linux)
     
     import Foundation
     import Result
@@ -137,4 +137,4 @@
         public static let global:ExecutionContextType = PThreadExecutionContext(kind: .Parallel)
     }
 
-#endif
+//#endif
