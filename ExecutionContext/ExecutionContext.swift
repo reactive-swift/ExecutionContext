@@ -15,7 +15,6 @@
 //===----------------------------------------------------------------------===//
 
 import Foundation
-import CoreFoundation
 import Result
 
 public typealias Task = () throws -> Void
@@ -171,9 +170,7 @@ public func sleep(timeout:Double) {
 
 @noreturn public func executionContextMain() {
     #if os(Linux)
-        while true {
-            CFRunLoopRunInMode(defaultMode, 0, true)
-        }
+        RunLoop.runForever()
     #else
         dispatch_main()
     #endif
