@@ -73,15 +73,16 @@
         
         override init() {
             var runLoop:RunLoop?
-            let cond = NSCondition()
-            cond.lock()
+            let sema = Semaphore()
+            
             PThread(task: {
                 runLoop = RunLoop.currentRunLoop(true)
-                cond.signal()
+                sema.signal()
                 RunLoop.run()
             }).start()
-            cond.wait()
-            cond.unlock()
+            
+            sema.wait()
+
             self.rl = runLoop!
         }
         

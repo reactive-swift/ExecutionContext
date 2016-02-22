@@ -129,24 +129,16 @@ extension ExecutionContextType {
     func syncThroughAsync<ReturnType>(task:() throws -> ReturnType) throws -> ReturnType {
         var result:Result<ReturnType, AnyError>?
         
-        let cond = NSCondition()
-        var done = false
+        let sema = Semaphore()
         
         async {
             defer {
-                cond.lock()
-                done = true
-                cond.signal()
-                cond.unlock()
+                sema.signal()
             }
             result = materialize(task)
         }
         
-        cond.lock()
-        while !done {
-            cond.wait()
-        }
-        cond.unlock()
+        sema.wait()
         
         return try result!.dematerializeAnyError()
     }

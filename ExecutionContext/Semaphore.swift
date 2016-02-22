@@ -40,10 +40,10 @@ public class Semaphore {
         self.value = value
     }
     
-    /// Creates a new semaphore with initial value 1
+    /// Creates a new semaphore with initial value 0
     /// This kind of semaphores is useful to protect a critical section
     public convenience init() {
-        self.init(value: 1)
+        self.init(value: 0)
     }
     
     /// returns true on success (false if timeout expired)
