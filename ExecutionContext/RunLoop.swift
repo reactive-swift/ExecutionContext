@@ -171,7 +171,7 @@ import CoreFoundation
             if CFRunLoopSourceIsValid(crls) {
                 CFRunLoopAddSource(cfRunLoop, crls, mode.cfString)
                 rls.info.runLoops.append(self)
-                CFRunLoopSourceSignal(unsafeBitCast(rls.cfObject, CFRunLoopSource.self))
+                CFRunLoopSourceSignal(crls)
                 CFRunLoopWakeUp(cfRunLoop)
             }
 		}
