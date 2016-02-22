@@ -55,13 +55,13 @@ import CoreFoundation
 		var cfObject: AnyObject { mutating get }
 	}
 
-	struct RunLoopSource : RunLoopCallback {
+	class RunLoopSource : RunLoopCallback {
 		private let info : RunLoopCallbackInfo
 		private let priority : Int
         private var _source: CFRunLoopSource! = nil
 
 		private var cfObject : AnyObject {
-            mutating get {
+            get {
                 if _source == nil {
                     var context = CFRunLoopSourceContext(
                         version: 0,
@@ -91,13 +91,13 @@ import CoreFoundation
         runLoopCallbackInfoRun(i)
     }
 
-	struct RunLoopDelay : RunLoopCallback {
+	class RunLoopDelay : RunLoopCallback {
 		private let info : RunLoopCallbackInfo
 		private let delay: Double
         private var _timer: CFRunLoopTimer! = nil
 
 		private var cfObject : AnyObject {
-            mutating get {
+            get {
                 if _timer == nil {
                     var context = CFRunLoopTimerContext(
                         version: 0,
@@ -167,14 +167,14 @@ import CoreFoundation
 			while true { run() }
 		}
 
-		func addSource(var rls: RunLoopSource, mode: NSString) {
+		func addSource(rls: RunLoopSource, mode: NSString) {
 			rls.info.runLoops.append(self)
 			CFRunLoopAddSource(cfRunLoop, unsafeBitCast(rls.cfObject, CFRunLoopSource.self), mode.cfString)
 			CFRunLoopSourceSignal(unsafeBitCast(rls.cfObject, CFRunLoopSource.self))
 			CFRunLoopWakeUp(cfRunLoop)
 		}
 
-		func addDelay(var rld: RunLoopDelay, mode: NSString) {
+		func addDelay(rld: RunLoopDelay, mode: NSString) {
 			rld.info.runLoops.append(self)
 			CFRunLoopAddTimer(cfRunLoop, unsafeBitCast(rld.cfObject, CFRunLoopTimer.self), mode.cfString)
 			CFRunLoopWakeUp(cfRunLoop)
