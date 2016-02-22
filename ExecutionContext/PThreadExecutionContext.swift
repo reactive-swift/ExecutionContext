@@ -72,18 +72,18 @@
         private let rl:RunLoop
         
         override init() {
-            var runLoop:RunLoop?
+            var runLoop:AnyObject?
             let sema = Semaphore()
             
             PThread(task: {
-                runLoop = RunLoop.currentRunLoop(true)
+                runLoop = RunLoop.currentCFRunLoop()
                 sema.signal()
                 RunLoop.run()
             }).start()
             
             sema.wait()
 
-            self.rl = runLoop!
+            self.rl = RunLoop(runLoop!, autoStop: true)
         }
         
         init(runLoop:RunLoop) {

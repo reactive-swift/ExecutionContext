@@ -37,22 +37,13 @@ import CoreFoundation
 	}
 
 	private func runLoopCallbackInfoRun(i: UnsafeMutablePointer<Void>) {
-        let info = Unmanaged<RunLoopCallbackInfo>.fromOpaque(COpaquePointer(i)).takeUnretainedValue()
+        let info = Unmanaged<RunLoopCallbackInfo>.fromOpaque(COpaquePointer(i)).takeRetainedValue()
         info.run()
-    }
-
-    private func runLoopCallbackInfoRetain(i: UnsafePointer<Void>) -> UnsafePointer<Void> {
-        Unmanaged<RunLoopCallbackInfo>.fromOpaque(COpaquePointer(i)).retain()
-        return i
-    }
-
-    private func runLoopCallbackInfoRelease(i: UnsafePointer<Void>) {
-        Unmanaged<RunLoopCallbackInfo>.fromOpaque(COpaquePointer(i)).release()
     }
 
 	private protocol RunLoopCallback {
 		var info : RunLoopCallbackInfo { get }
-		var cfObject: AnyObject { mutating get }
+		var cfObject: AnyObject { get }
 	}
 
 	class RunLoopSource : RunLoopCallback {
@@ -65,9 +56,9 @@ import CoreFoundation
                 if _source == nil {
                     var context = CFRunLoopSourceContext(
                         version: 0,
-                        info: UnsafeMutablePointer<Void>(Unmanaged.passUnretained(info).toOpaque()),
-                        retain: runLoopCallbackInfoRetain,
-                        release: runLoopCallbackInfoRelease,
+                        info: UnsafeMutablePointer<Void>(Unmanaged.passRetained(info).toOpaque()),
+                        retain: nil,
+                        release: nil,
                         copyDescription: nil,
                         equal: nil,
                         hash: nil,
@@ -101,9 +92,9 @@ import CoreFoundation
                 if _timer == nil {
                     var context = CFRunLoopTimerContext(
                         version: 0,
-                        info: UnsafeMutablePointer<Void>(Unmanaged.passUnretained(info).toOpaque()),
-                        retain: runLoopCallbackInfoRetain,
-                        release: runLoopCallbackInfoRelease,
+                        info: UnsafeMutablePointer<Void>(Unmanaged.passRetained(info).toOpaque()),
+                        retain: nil,
+                        release: nil,
                         copyDescription: nil
                     )
                     _timer = CFRunLoopTimerCreate(nil, CFAbsoluteTimeGetCurrent()+delay, -1, 0, 0, timerRunCallback, &context)
@@ -128,9 +119,13 @@ import CoreFoundation
     		static let defaultMode:NSString = "kCFRunLoopDefaultMode".bridge()
 		#endif
 
-		init(_ runLoop: CFRunLoop, autoStop: Bool = true) {
-			self.cfRunLoop = runLoop
-			self.autoStop = autoStop
+        init(_ cfRunLoop: CFRunLoop, autoStop: Bool = true) {
+            self.cfRunLoop = cfRunLoop
+            self.autoStop = autoStop
+        }
+        
+		convenience init(_ runLoop: AnyObject, autoStop: Bool = true) {
+            self.init(unsafeBitCast(runLoop, CFRunLoop.self), autoStop: autoStop)
 		}
 
 		deinit {
@@ -146,6 +141,10 @@ import CoreFoundation
 		static func mainRunLoop() -> RunLoop {
 			return RunLoop(CFRunLoopGetMain(), autoStop: false)
 		}
+        
+        static func currentCFRunLoop() -> AnyObject {
+            return CFRunLoopGetCurrent()
+        }
 
 		func isCurrent() -> Bool {
 			return cfRunLoop === CFRunLoopGetCurrent()
@@ -168,16 +167,22 @@ import CoreFoundation
 		}
 
 		func addSource(rls: RunLoopSource, mode: NSString) {
-			rls.info.runLoops.append(self)
-			CFRunLoopAddSource(cfRunLoop, unsafeBitCast(rls.cfObject, CFRunLoopSource.self), mode.cfString)
-			CFRunLoopSourceSignal(unsafeBitCast(rls.cfObject, CFRunLoopSource.self))
-			CFRunLoopWakeUp(cfRunLoop)
+            let crls = unsafeBitCast(rls.cfObject, CFRunLoopSource.self)
+            if CFRunLoopSourceIsValid(crls) {
+                CFRunLoopAddSource(cfRunLoop, crls, mode.cfString)
+                rls.info.runLoops.append(self)
+                CFRunLoopSourceSignal(unsafeBitCast(rls.cfObject, CFRunLoopSource.self))
+                CFRunLoopWakeUp(cfRunLoop)
+            }
 		}
 
 		func addDelay(rld: RunLoopDelay, mode: NSString) {
-			rld.info.runLoops.append(self)
-			CFRunLoopAddTimer(cfRunLoop, unsafeBitCast(rld.cfObject, CFRunLoopTimer.self), mode.cfString)
-			CFRunLoopWakeUp(cfRunLoop)
+            let crld = unsafeBitCast(rld.cfObject, CFRunLoopTimer.self)
+            if CFRunLoopTimerIsValid(crld) {
+                CFRunLoopAddTimer(cfRunLoop, crld, mode.cfString)
+                rld.info.runLoops.append(self)
+                CFRunLoopWakeUp(cfRunLoop)
+            }
 		}
 	}
 //#endif
