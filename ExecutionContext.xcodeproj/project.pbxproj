@@ -52,6 +52,10 @@
 		65FB86CA1C78AC8B0005CD1B /* ImmediateExecutionContext.swift in Sources */ = {isa = PBXBuildFile; fileRef = 659E809B1C77457E00DE85B1 /* ImmediateExecutionContext.swift */; };
 		65FB86CB1C78AC8B0005CD1B /* Result+Some.swift in Sources */ = {isa = PBXBuildFile; fileRef = 659E809D1C77457E00DE85B1 /* Result+Some.swift */; };
 		65FB86CC1C78ACAE0005CD1B /* Result.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 659E80F01C78A70700DE85B1 /* Result.framework */; };
+		9678EA2D1C7B22DC00E39B17 /* RunLoop.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9678EA2C1C7B22DC00E39B17 /* RunLoop.swift */; };
+		9678EA2E1C7B22DC00E39B17 /* RunLoop.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9678EA2C1C7B22DC00E39B17 /* RunLoop.swift */; };
+		9678EA2F1C7B22DC00E39B17 /* RunLoop.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9678EA2C1C7B22DC00E39B17 /* RunLoop.swift */; };
+		9678EA301C7B22DC00E39B17 /* RunLoop.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9678EA2C1C7B22DC00E39B17 /* RunLoop.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -149,6 +153,7 @@
 		65FB86981C78AA400005CD1B /* ExecutionContext.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = ExecutionContext.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		65FB86A11C78AA400005CD1B /* ExecutionContextTests-tvOS.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = "ExecutionContextTests-tvOS.xctest"; sourceTree = BUILT_PRODUCTS_DIR; };
 		65FB86BE1C78AC260005CD1B /* ExecutionContext.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = ExecutionContext.framework; sourceTree = BUILT_PRODUCTS_DIR; };
+		9678EA2C1C7B22DC00E39B17 /* RunLoop.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = RunLoop.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -242,6 +247,7 @@
 				659E80981C77457E00DE85B1 /* DefaultExecutionContext.swift */,
 				659E80991C77457E00DE85B1 /* DispatchExecutionContext.swift */,
 				659E809C1C77457E00DE85B1 /* PThreadExecutionContext.swift */,
+				9678EA2C1C7B22DC00E39B17 /* RunLoop.swift */,
 				659E809B1C77457E00DE85B1 /* ImmediateExecutionContext.swift */,
 				65E646DC1C79949C0036D028 /* CustomExecutionContext.swift */,
 				659E809D1C77457E00DE85B1 /* Result+Some.swift */,
@@ -597,6 +603,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				659E809F1C77457E00DE85B1 /* DispatchExecutionContext.swift in Sources */,
+				9678EA2D1C7B22DC00E39B17 /* RunLoop.swift in Sources */,
 				659E80A01C77457E00DE85B1 /* ExecutionContext.swift in Sources */,
 				65E646DD1C79949C0036D028 /* CustomExecutionContext.swift in Sources */,
 				659E80A31C77457E00DE85B1 /* Result+Some.swift in Sources */,
@@ -620,6 +627,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				659E80D81C78A4AF00DE85B1 /* DefaultExecutionContext.swift in Sources */,
+				9678EA2E1C7B22DC00E39B17 /* RunLoop.swift in Sources */,
 				659E80DA1C78A4B500DE85B1 /* PThreadExecutionContext.swift in Sources */,
 				65E646DE1C7994A00036D028 /* CustomExecutionContext.swift in Sources */,
 				659E80DC1C78A4BC00DE85B1 /* Result+Some.swift in Sources */,
@@ -643,6 +651,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				65FB86B01C78AAE00005CD1B /* DefaultExecutionContext.swift in Sources */,
+				9678EA2F1C7B22DC00E39B17 /* RunLoop.swift in Sources */,
 				65FB86B21C78AAE50005CD1B /* PThreadExecutionContext.swift in Sources */,
 				65E646DF1C7994A10036D028 /* CustomExecutionContext.swift in Sources */,
 				65FB86B41C78AAE50005CD1B /* Result+Some.swift in Sources */,
@@ -666,6 +675,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				65FB86C71C78AC8B0005CD1B /* DefaultExecutionContext.swift in Sources */,
+				9678EA301C7B22DC00E39B17 /* RunLoop.swift in Sources */,
 				65FB86C91C78AC8B0005CD1B /* PThreadExecutionContext.swift in Sources */,
 				65E646E01C7994A20036D028 /* CustomExecutionContext.swift in Sources */,
 				65FB86CB1C78AC8B0005CD1B /* Result+Some.swift in Sources */,

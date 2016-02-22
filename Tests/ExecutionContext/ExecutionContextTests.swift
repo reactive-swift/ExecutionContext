@@ -159,9 +159,9 @@ extension ExecutionContextTests : XCTestCaseProvider {
             ("testParallel", testParallel),
             ("testGlobal", testGlobal),
             ("testMain", testMain),
-            ("testMain", testCustomOnGlobal),
-            ("testMain", testCustomOnMain),
-            ("testMain", testCustomSimple)
+            ("testCustomOnGlobal", testCustomOnGlobal),
+            ("testCustomOnMain", testCustomOnMain),
+            ("testCustomSimple", testCustomSimple)
         ]
     }
 }
