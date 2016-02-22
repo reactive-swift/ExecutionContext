@@ -16,15 +16,15 @@
 
 import Foundation
 
-#if os(Linux)
+//#if os(Linux)
     
     public typealias DefaultExecutionContext = PThreadExecutionContext
     
-#else
+/*#else
     
     public typealias DefaultExecutionContext = DispatchExecutionContext
     
-#endif
+#endif*/
 
 public protocol DefaultExecutionContextType : ExecutionContextType {
     init(kind:ExecutionContextKind)

@@ -17,7 +17,7 @@
 //////////////////////////////////////////////////////////////////////////
 //This file is a temporary solution, just until Dispatch will run on Mac//
 //////////////////////////////////////////////////////////////////////////
-#if os(Linux)
+//#if os(Linux)
     
     import Foundation
     import Result
@@ -73,15 +73,16 @@
         
         override init() {
             var runLoop:RunLoop?
-            let cond = NSCondition()
-            cond.lock()
+            let sema = Semaphore()
+            
             PThread(task: {
                 runLoop = RunLoop.currentRunLoop(true)
-                cond.signal()
+                sema.signal()
                 RunLoop.run()
             }).start()
-            cond.wait()
-            cond.unlock()
+            
+            sema.wait()
+
             self.rl = runLoop!
         }
         
@@ -136,4 +137,4 @@
         public static let global:ExecutionContextType = PThreadExecutionContext(kind: .Parallel)
     }
 
-#endif
+//#endif

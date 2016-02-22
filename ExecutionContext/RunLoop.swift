@@ -17,7 +17,7 @@
 import Foundation
 import CoreFoundation
 
-#if os(Linux)
+//#if os(Linux)
 
 	private extension NSString {
         var cfString: CFString { return unsafeBitCast(self, CFString.self) }
@@ -180,4 +180,4 @@ import CoreFoundation
 			CFRunLoopWakeUp(cfRunLoop)
 		}
 	}
-#endif
+//#endif
