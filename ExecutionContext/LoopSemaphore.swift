@@ -145,4 +145,4 @@ public class CFRunLoopSemaphore : SemaphoreType {
     }
 }
 
-public typealias LoopSemaphore = Semaphore
+public typealias LoopSemaphore = CFRunLoopSemaphore
