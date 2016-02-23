@@ -265,10 +265,6 @@ import CoreFoundation
 		static func mainRunLoop() -> RunLoop {
 			return MainRunLoop
 		}
-        
-        static func currentCFRunLoop() -> AnyObject {
-            return CFRunLoopGetCurrent()
-        }
 
 		func isCurrent() -> Bool {
 			return cfRunLoop === CFRunLoopGetCurrent()

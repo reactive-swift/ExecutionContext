@@ -99,11 +99,11 @@
         private let rl:RunLoop
         
         override init() {
-            var runLoop:AnyObject?
+            let runLoop:NSMutableArray = NSMutableArray(capacity: 1)
             let sema = Semaphore()
             
-            PThread(task: {
-                runLoop = RunLoop.currentCFRunLoop()
+            PThread(task: { [unowned runLoop] in
+                runLoop.addObject(RunLoop.currentRunLoop())
                 RunLoop.runWithOptions(RunLoop.defaultMode, timeout: 0, once: true)
                 sema.signal()
                 RunLoop.run()
@@ -111,7 +111,7 @@
             
             sema.wait()
 
-            self.rl = RunLoop(runLoop!)
+            self.rl = runLoop.objectAtIndex(0) as! RunLoop
         }
         
         init(runLoop:RunLoop) {
