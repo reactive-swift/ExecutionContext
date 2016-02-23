@@ -144,6 +144,9 @@ import CoreFoundation
         func signal() {
             if _source != nil {
                 CFRunLoopSourceSignal(_source)
+                for loop in info.runLoops {
+                    loop.wakeUp()
+                }
             }
         }
 	}
@@ -265,7 +268,7 @@ import CoreFoundation
             if CFRunLoopSourceIsValid(crls) {
                 CFRunLoopAddSource(cfRunLoop, crls, mode.cfString)
                 if retainLoop { rls.info.runLoops.append(self) }
-                CFRunLoopWakeUp(cfRunLoop)
+                wakeUp()
             }
 		}
 
@@ -274,13 +277,16 @@ import CoreFoundation
             if CFRunLoopTimerIsValid(crld) && (rld.info.runLoops.count == 0 || rld.info.runLoops[0] === self) {
                 CFRunLoopAddTimer(cfRunLoop, crld, mode.cfString)
                 rld.info.runLoops.append(self)
-                CFRunLoopWakeUp(cfRunLoop)
+                wakeUp()
             }
 		}
         
         func addTask(task: SafeTask) {
             taskQueue.enqueue(TaskQueueElement(task, runLoopSource: taskQueueSource))
             taskQueueSource.signal()
+        }
+        
+        func wakeUp() {
             CFRunLoopWakeUp(cfRunLoop)
         }
 	}
