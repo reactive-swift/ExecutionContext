@@ -200,7 +200,10 @@ import CoreFoundation
             let queue = TaskQueue()
             
             taskQueueSource = RunLoopSource({
-                queue.dequeue()?.run()
+                if let element = queue.dequeue() {
+                    element.run()
+                    element.source.signal()
+                }
             })
             taskQueue = queue
             addSource(taskQueueSource, mode: RunLoop.defaultMode, retainLoop: false)
