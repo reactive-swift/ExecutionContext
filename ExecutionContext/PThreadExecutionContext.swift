@@ -83,7 +83,7 @@
             
             sema.wait()
 
-            self.rl = RunLoop(runLoop!, autoStop: true)
+            self.rl = RunLoop(runLoop!)
         }
         
         init(runLoop:RunLoop) {
@@ -91,7 +91,7 @@
         }
         
         func async(task:SafeTask) {
-            rl.addSource(RunLoopSource(task), mode: RunLoop.defaultMode)
+            rl.addTask(task)
         }
         
         func async(after:Double, task:SafeTask) {
