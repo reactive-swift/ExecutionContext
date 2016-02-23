@@ -77,7 +77,8 @@ public class CFRunLoopSemaphore : SemaphoreType {
         self.source = RunLoopSource( { [unowned self] in
             self.signaled = true
             self.value += 1
-        }, priority: -1)
+        }, priority: 1)
+        RunLoop.currentRunLoop().addSource(source!, mode: RunLoop.defaultMode)
     }
     
     /// Creates a new semaphore with initial value 0
@@ -94,8 +95,6 @@ public class CFRunLoopSemaphore : SemaphoreType {
     /// if nil is passed - waits forever
     public func wait(until:NSDate?) -> Bool {
         let until = until.getOrElse(NSDate.distantFuture())
-        
-        RunLoop.currentRunLoop().addSource(source!, mode: RunLoop.defaultMode)
         
         defer {
             self.signaled = false
