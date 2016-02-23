@@ -123,8 +123,8 @@ import CoreFoundation
                         copyDescription: nil,
                         equal: nil,
                         hash: nil,
-                        schedule: {(info, loop, mode) in print("Scheduled") },
-                        cancel: {(info) in print("Cancelled") },
+                        schedule: {(info, loop, mode) in print("Scheduled in \(loop)") },
+                        cancel: {(info, loop, mode) in print("Removed \(loop)") },
                         perform: runLoopCallbackInfoRun
                     )
                     _source = CFRunLoopSourceCreate(nil, -priority, &context)
