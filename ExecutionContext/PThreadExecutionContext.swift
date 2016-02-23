@@ -30,8 +30,18 @@
         pthread.task?()
         return nil
     }
-    
-    private class PThread {
+
+    internal class PThreadKey {
+        private var key: pthread_key_t = 0
+        init(destructionCallback: (@convention(c) UnsafeMutablePointer<Void> -> Void)! = nil) {
+            pthread_key_create(&key, destructionCallback)
+        }
+        deinit {
+            pthread_key_delete(key)
+        }
+    }
+
+    internal class PThread {
         let thread: UnsafeMutablePointer<pthread_t>
         let task:SafeTask?
         
@@ -47,6 +57,23 @@
         func start() {
             pthread_create(thread, nil, thread_proc, UnsafeMutablePointer<Void>(Unmanaged.passRetained(self).toOpaque()))
         }
+        
+        static func getSpecific(key: PThreadKey) -> AnyObject? {
+            let val = pthread_getspecific(key.key)
+            if val == nil {
+                return nil
+            }
+            return Unmanaged<AnyObject>.fromOpaque(COpaquePointer(val)).takeUnretainedValue()
+        }
+        
+        static func setSpecific(obj: AnyObject?, key: PThreadKey) {
+            if obj == nil {
+                pthread_setspecific(key.key, nil)
+            } else {
+                pthread_setspecific(key.key, UnsafePointer<Void>(Unmanaged.passUnretained(obj!).toOpaque()))
+            }
+        }
+        
     }
     
     private class ParallelContext : ExecutionContextBase, ExecutionContextType {
