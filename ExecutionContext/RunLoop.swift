@@ -71,9 +71,13 @@ import CoreFoundation
         }
     }
 
+    internal protocol WakeableRunLoop : AnyObject {
+        func wakeUp()
+    }
+
 	private class RunLoopCallbackInfo {
 		private var task: SafeTask
-		private var runLoops: [RunLoop] = []
+		private var runLoops: [WakeableRunLoop] = []
 
 		init(_ task: SafeTask) {
 			self.task = task
@@ -123,7 +127,7 @@ import CoreFoundation
                         cancel: nil,
                         perform: runLoopCallbackInfoRun
                     )
-                    _source = CFRunLoopSourceCreate(nil, priority, &context)
+                    _source = CFRunLoopSourceCreate(nil, -priority, &context)
                 }
                 return _source
             }
@@ -182,7 +186,19 @@ import CoreFoundation
         }
 	}
 
-	class RunLoop {
+    private class CFRunLoopWakeupHolder: WakeableRunLoop {
+        private let loop:CFRunLoop!
+        
+        init(loop: CFRunLoop!) {
+            self.loop = loop
+        }
+        
+        func wakeUp() {
+            CFRunLoopWakeUp(loop)
+        }
+    }
+
+    class RunLoop : WakeableRunLoop {
 		private let cfRunLoop: CFRunLoop!
         
         private var taskQueueSource: RunLoopSource
@@ -193,6 +209,10 @@ import CoreFoundation
 		#else
     		static let defaultMode:NSString = "kCFRunLoopDefaultMode".bridge()
 		#endif
+        
+        private static let threadKey = PThreadKey()
+        
+        private static let MainRunLoop = RunLoop.createMainRunLoop()
 
         init(_ cfRunLoop: CFRunLoop) {
             self.cfRunLoop = cfRunLoop
@@ -209,16 +229,41 @@ import CoreFoundation
             addSource(taskQueueSource, mode: RunLoop.defaultMode, retainLoop: false)
         }
         
+        deinit {
+            addTask {
+                PThread.setSpecific(nil, key: RunLoop.threadKey)
+            }
+        }
 		convenience init(_ runLoop: AnyObject) {
             self.init(unsafeBitCast(runLoop, CFRunLoop.self))
 		}
+        
+        private static func createMainRunLoop() -> RunLoop {
+            let runLoop = RunLoop(CFRunLoopGetMain())
+            if runLoop.isCurrent() {
+                PThread.setSpecific(runLoop, key: RunLoop.threadKey)
+            } else {
+                let sema = Semaphore()
+                runLoop.addTask({
+                    PThread.setSpecific(runLoop, key: RunLoop.threadKey)
+                    sema.signal()
+                })
+                sema.wait()
+            }
+            return runLoop
+        }
 
 		static func currentRunLoop() -> RunLoop {
-			return RunLoop(CFRunLoopGetCurrent())
+            guard let loop = PThread.getSpecific(RunLoop.threadKey) else {
+                let loop = RunLoop(CFRunLoopGetCurrent())
+                PThread.setSpecific(loop, key: RunLoop.threadKey)
+                return loop
+            }
+			return unsafeBitCast(loop, RunLoop.self)
 		}
 
 		static func mainRunLoop() -> RunLoop {
-			return RunLoop(CFRunLoopGetMain())
+			return MainRunLoop
 		}
         
         static func currentCFRunLoop() -> AnyObject {
@@ -270,7 +315,11 @@ import CoreFoundation
             let crls = unsafeBitCast(rls.cfObject, CFRunLoopSource.self)
             if CFRunLoopSourceIsValid(crls) {
                 CFRunLoopAddSource(cfRunLoop, crls, mode.cfString)
-                if retainLoop { rls.info.runLoops.append(self) }
+                if retainLoop {
+                    rls.info.runLoops.append(self)
+                } else {
+                    rls.info.runLoops.append(CFRunLoopWakeupHolder(loop: cfRunLoop))
+                }
                 wakeUp()
             }
 		}

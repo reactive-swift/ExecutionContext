@@ -22,6 +22,8 @@ import XCTest
 #endif
 
 class ExecutionContextTests: XCTestCase {
+    //Tests does not create static variables. We need initialized main thread
+    let mainContext = DefaultExecutionContext.main
     
     func syncTest(context:ExecutionContextType) {
         let expectation = self.expectationWithDescription("OK SYNC")
@@ -136,7 +138,7 @@ class ExecutionContextTests: XCTestCase {
     }
     
     func testSemaphore() {
-        let sema = Semaphore()
+        let sema = Semaphore(value: 1)
         var n = 0
         for _ in [0...100] {
             global.execute {
