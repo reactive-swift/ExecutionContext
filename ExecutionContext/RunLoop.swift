@@ -195,6 +195,7 @@ import CoreFoundation
         
         func wakeUp() {
             CFRunLoopWakeUp(loop)
+            print("Wakeup called!")
         }
     }
 
@@ -220,19 +221,10 @@ import CoreFoundation
             let queue = TaskQueue()
             
             taskQueueSource = RunLoopSource({
-                var element = queue.dequeue()
-                let source = element?.source
-                
-                while element != nil {
-                    element!.run()
-                    element = queue.dequeue()
+                if let element = queue.dequeue() {
+                    element.run()
+                    element.source.signal()
                 }
-                
-                source?.signal()                
-//                if let element = queue.dequeue() {
-//                    element.run()
-//                    element.source.signal()
-//                }
             })
             taskQueue = queue
             addSource(taskQueueSource, mode: RunLoop.defaultMode, retainLoop: false)
