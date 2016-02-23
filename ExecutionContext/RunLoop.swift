@@ -288,8 +288,6 @@ import CoreFoundation
         }
         
         static func runWithOptions(mode: NSString, timeout:NSTimeInterval, once:Bool) {
-            let runLoop = RunLoop.currentRunLoop()
-            print("Run loop \(runLoop.cfRunLoop)")
             #if !os(Linux)
                 //var result:CFRunLoopRunResult
                 //result =
