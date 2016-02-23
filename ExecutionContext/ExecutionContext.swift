@@ -129,7 +129,7 @@ extension ExecutionContextType {
     func syncThroughAsync<ReturnType>(task:() throws -> ReturnType) throws -> ReturnType {
         var result:Result<ReturnType, AnyError>?
         
-        let sema = Semaphore()
+        let sema = LoopSemaphore()
         let id = NSUUID().UUIDString
         
         print("before async: ", id)

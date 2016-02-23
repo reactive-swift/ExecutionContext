@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		658566A31C7CAEE3003B0E08 /* LoopSemaphore.swift in Sources */ = {isa = PBXBuildFile; fileRef = 658566A21C7CAEE3003B0E08 /* LoopSemaphore.swift */; };
 		659E80891C77450200DE85B1 /* ExecutionContext.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 659E807E1C77450200DE85B1 /* ExecutionContext.framework */; };
 		659E808E1C77450200DE85B1 /* ExecutionContextTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 659E808D1C77450200DE85B1 /* ExecutionContextTests.swift */; };
 		659E809E1C77457E00DE85B1 /* DefaultExecutionContext.swift in Sources */ = {isa = PBXBuildFile; fileRef = 659E80981C77457E00DE85B1 /* DefaultExecutionContext.swift */; };
@@ -119,6 +120,7 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
+		658566A21C7CAEE3003B0E08 /* LoopSemaphore.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = LoopSemaphore.swift; sourceTree = "<group>"; };
 		659E807E1C77450200DE85B1 /* ExecutionContext.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = ExecutionContext.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		659E80831C77450200DE85B1 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		659E80881C77450200DE85B1 /* ExecutionContextTests-OSX.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = "ExecutionContextTests-OSX.xctest"; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -253,6 +255,7 @@
 				659E809D1C77457E00DE85B1 /* Result+Some.swift */,
 				65E646F11C79E0580036D028 /* Semaphore.swift */,
 				659E80831C77450200DE85B1 /* Info.plist */,
+				658566A21C7CAEE3003B0E08 /* LoopSemaphore.swift */,
 			);
 			path = ExecutionContext;
 			sourceTree = "<group>";
@@ -610,6 +613,7 @@
 				659E80A11C77457E00DE85B1 /* ImmediateExecutionContext.swift in Sources */,
 				659E809E1C77457E00DE85B1 /* DefaultExecutionContext.swift in Sources */,
 				65E646F21C79E0590036D028 /* Semaphore.swift in Sources */,
+				658566A31C7CAEE3003B0E08 /* LoopSemaphore.swift in Sources */,
 				659E80A21C77457E00DE85B1 /* PThreadExecutionContext.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
