@@ -237,15 +237,14 @@ import CoreFoundation
         
         static func runWithOptions(mode: NSString, timeout:NSTimeInterval, once:Bool) {
             #if !os(Linux)
-                var result:CFRunLoopRunResult
-                repeat {
-                    result = CFRunLoopRunInMode(mode.cfString, timeout, once)
-                } while result != .Finished && result != .Stopped && result != .TimedOut
+                //var result:CFRunLoopRunResult
+                //result =
+                CFRunLoopRunInMode(mode.cfString, timeout, once)
             #else
-                var result:Int32
-                repeat {
-                    result = CFRunLoopRunInMode(mode.cfString, timeout, once)
-                } while result != Int32(kCFRunLoopRunStopped) && result != Int32(kCFRunLoopRunFinished) && result != Int32(kCFRunLoopRunTimedOut)
+                //var result:Int32
+                //result =
+                CFRunLoopRunInMode(mode.cfString, timeout, once)
+                //Int32(kCFRunLoopRunStopped)
             #endif
         }
         
@@ -266,7 +265,6 @@ import CoreFoundation
             if CFRunLoopSourceIsValid(crls) {
                 CFRunLoopAddSource(cfRunLoop, crls, mode.cfString)
                 if retainLoop { rls.info.runLoops.append(self) }
-                rls.signal()
                 CFRunLoopWakeUp(cfRunLoop)
             }
 		}
