@@ -123,8 +123,8 @@ import CoreFoundation
                         copyDescription: nil,
                         equal: nil,
                         hash: nil,
-                        schedule: nil,
-                        cancel: nil,
+                        schedule: {(info, loop, mode) in print("Scheduled") },
+                        cancel: {(info) in print("Cancelled") },
                         perform: runLoopCallbackInfoRun
                     )
                     _source = CFRunLoopSourceCreate(nil, -priority, &context)
@@ -321,6 +321,8 @@ import CoreFoundation
                     rls.info.runLoops.append(CFRunLoopWakeupHolder(loop: cfRunLoop))
                 }
                 wakeUp()
+            } else {
+                print("!!!!!!!!!!!!!NOT VALID!!!!!!!!!!")
             }
 		}
 
