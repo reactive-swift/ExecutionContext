@@ -226,19 +226,35 @@ import CoreFoundation
 		static func run() {
 			runInMode(RunLoop.defaultMode)
 		}
-
-		static func runInMode(mode: NSString) {
-			#if !os(Linux)
+        
+        static func runUntil(mode: NSString, until:NSDate) {
+            RunLoop.runWithTimeout(mode, timeout: until.timeIntervalSinceNow)
+        }
+        
+        static func runUntilOnce(mode: NSString, until:NSDate) {
+            RunLoop.runWithOptions(mode, timeout: until.timeIntervalSinceNow, once: true)
+        }
+        
+        static func runWithOptions(mode: NSString, timeout:NSTimeInterval, once:Bool) {
+            #if !os(Linux)
                 var result:CFRunLoopRunResult
                 repeat {
-                    result = CFRunLoopRunInMode(mode.cfString, Double.infinity, false)
-                } while result != .Finished && result != .Stopped
-			#else
+                    result = CFRunLoopRunInMode(mode.cfString, timeout, once)
+                } while result != .Finished && result != .Stopped && result != .TimedOut
+            #else
                 var result:Int32
                 repeat {
-                    result = CFRunLoopRunInMode(mode.cfString, Double.infinity, false)
-                } while result != Int32(kCFRunLoopRunStopped) && result != Int32(kCFRunLoopRunFinished)
-			#endif
+                    result = CFRunLoopRunInMode(mode.cfString, timeout, once)
+                } while result != Int32(kCFRunLoopRunStopped) && result != Int32(kCFRunLoopRunFinished) && result != Int32(kCFRunLoopRunTimedOut)
+            #endif
+        }
+        
+        static func runWithTimeout(mode: NSString, timeout:NSTimeInterval) {
+            RunLoop.runWithOptions(mode, timeout: timeout, once: false)
+        }
+
+		static func runInMode(mode: NSString) {
+            RunLoop.runWithTimeout(mode, timeout: Double.infinity)
 		}
 
 		@noreturn static func runForever() {
