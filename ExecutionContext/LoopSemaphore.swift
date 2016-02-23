@@ -66,26 +66,18 @@ extension Optional {
 public class CFRunLoopSemaphore : SemaphoreType {
     var source: RunLoopSource?
     var signaled: Bool
-    let lock:NSRecursiveLock
     
     private(set) public var value: Int
     
     /// Creates a new semaphore with the given initial value
     /// See NSCondition and https://developer.apple.com/library/prerelease/mac/documentation/Cocoa/Conceptual/Multithreading/ThreadSafety/ThreadSafety.html#//apple_ref/doc/uid/10000057i-CH8-SW13
     public required init(value: Int) {
-        let lock = NSRecursiveLock()
-        self.lock = lock
         self.value = value
         self.signaled = false
         self.source = RunLoopSource( { [unowned self] in
-            print("source signal")
-            lock.lock()
-            defer {
-                lock.unlock()
-            }
             self.signaled = true
             self.value += 1
-        }, priority: 0)
+        }, priority: -1)
     }
     
     /// Creates a new semaphore with initial value 0
@@ -105,26 +97,16 @@ public class CFRunLoopSemaphore : SemaphoreType {
         
         RunLoop.currentRunLoop().addSource(source!, mode: RunLoop.defaultMode)
         
-        lock.lock()
-        self.signaled = false
         defer {
             self.signaled = false
-            lock.unlock()
         }
         
         var timedout:Bool = false
         
         while value <= 0 {
-            do {
-                lock.unlock()
-                defer {
-                    lock.lock()
-                }
-                repeat {
-                    print("asdasdas")
-                    RunLoop.runUntilOnce(RunLoop.defaultMode, until: until)
-                    timedout = !until.isGreaterThan(NSDate())
-                } while !self.signaled && !timedout
+            while !self.signaled && !timedout {
+                RunLoop.runUntilOnce(RunLoop.defaultMode, until: until)
+                timedout = !until.isGreaterThan(NSDate())
             }
             if timedout {
                 break
