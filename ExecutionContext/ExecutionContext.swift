@@ -132,10 +132,8 @@ extension ExecutionContextType {
         let sema = Semaphore()
         
         async {
-            defer {
-                sema.signal()
-            }
             result = materialize(task)
+            sema.signal()
         }
         
         sema.wait()
