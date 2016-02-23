@@ -32,7 +32,7 @@ class ExecutionContextTests: XCTestCase {
             expectation.fulfill()
         }
         
-        self.waitForExpectationsWithTimeout(1, handler: nil)
+        self.waitForExpectationsWithTimeout(0, handler: nil)
     }
     
     func asyncTest(context:ExecutionContextType) {

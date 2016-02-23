@@ -195,7 +195,6 @@ import CoreFoundation
         
         func wakeUp() {
             CFRunLoopWakeUp(loop)
-            print("Wakeup called!")
         }
     }
 

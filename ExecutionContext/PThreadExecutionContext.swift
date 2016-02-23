@@ -104,6 +104,7 @@
             
             PThread(task: {
                 runLoop = RunLoop.currentCFRunLoop()
+                RunLoop.runWithOptions(RunLoop.defaultMode, timeout: 0, once: true)
                 sema.signal()
                 RunLoop.run()
             }).start()

@@ -121,7 +121,6 @@ public class CFRunLoopSemaphore : SemaphoreType {
     
     /// Performs the signal operation on this semaphore
     public func signal() -> Int {
-        print("Signaled")
         source?.signal()
         return value
     }
