@@ -130,15 +130,22 @@ extension ExecutionContextType {
         var result:Result<ReturnType, AnyError>?
         
         let sema = Semaphore()
+        let id = NSUUID().UUIDString
         
+        print("before async: ", id)
         async {
-            defer {
-                sema.signal()
-            }
+            print("started async: ", id)
             result = materialize(task)
+            print("materialized: ", id)
+            sema.signal()
+            print("signaled: ", id)
         }
         
+        print("will wait: ", id)
+        
         sema.wait()
+        
+        print("did wait: ", id)
         
         return try result!.dematerializeAnyError()
     }
