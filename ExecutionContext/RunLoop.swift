@@ -148,9 +148,9 @@ import CoreFoundation
         func signal() {
             if _source != nil {
                 CFRunLoopSourceSignal(_source)
-                for loop in info.runLoops {
-                    loop.wakeUp()
-                }
+            }
+            for loop in info.runLoops {
+                loop.wakeUp()
             }
         }
 	}
@@ -220,10 +220,19 @@ import CoreFoundation
             let queue = TaskQueue()
             
             taskQueueSource = RunLoopSource({
-                if let element = queue.dequeue() {
-                    element.run()
-                    element.source.signal()
+                var element = queue.dequeue()
+                let source = element?.source
+                
+                while element != nil {
+                    element!.run()
+                    element = queue.dequeue()
                 }
+                
+                source?.signal()                
+//                if let element = queue.dequeue() {
+//                    element.run()
+//                    element.source.signal()
+//                }
             })
             taskQueue = queue
             addSource(taskQueueSource, mode: RunLoop.defaultMode, retainLoop: false)
@@ -336,6 +345,7 @@ import CoreFoundation
         func addTask(task: SafeTask) {
             taskQueue.enqueue(TaskQueueElement(task, runLoopSource: taskQueueSource))
             taskQueueSource.signal()
+            wakeUp()
         }
         
         func wakeUp() {
