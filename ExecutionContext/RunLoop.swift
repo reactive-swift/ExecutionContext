@@ -71,17 +71,13 @@ import CoreFoundation
         }
     }
 
-    internal protocol WakeableRunLoop : AnyObject {
-        func wakeUp()
-    }
-
 	private class RunLoopCallbackInfo {
-		private var task: SafeTask
-		private var runLoops: [WakeableRunLoop] = []
+		private let task: SafeTask
+		private var runLoops: [RunLoop] = []
 
-		init(_ task: SafeTask) {
+        init(_ task: SafeTask) {
 			self.task = task
-		}
+        }
 
 		func run() {
 			task()
@@ -133,13 +129,27 @@ import CoreFoundation
             }
 		}
 
-		init(_ task: SafeTask, priority: Int = 0) {
-			self.info = RunLoopCallbackInfo(task)
-			self.priority = priority
+        init(_ task: SafeTask, priority: Int = 0, runOnce: Bool = false) {
+            self.priority = priority
+            if runOnce {
+                var stopTask:SafeTask?
+                self.info = RunLoopCallbackInfo({
+                    task()
+                    stopTask?()
+                })
+                stopTask = { self.stop() }
+            } else {
+                self.info = RunLoopCallbackInfo(task)
+            }
+			
 		}
         
         deinit {
-            if _source != nil && CFRunLoopSourceIsValid(_source) {
+            stop()
+        }
+
+        func stop() {
+        	if _source != nil && CFRunLoopSourceIsValid(_source) {
                 CFRunLoopSourceInvalidate(_source)
                 _source = nil
             }
@@ -152,6 +162,24 @@ import CoreFoundation
             for loop in info.runLoops {
                 loop.wakeUp()
             }
+        }
+	}
+
+	class RunLoopTaskQueueSource : RunLoopSource {
+		private let queue = TaskQueue()
+
+		init(priority: Int = 1) {
+			super.init({ [unowned queue] in
+                if let element = queue.dequeue() {
+                    element.run()
+                    element.source.signal()
+                }
+            }, priority: priority)
+		}
+
+		func addTask(task: SafeTask) {
+            queue.enqueue(TaskQueueElement(task, runLoopSource: self))
+            self.signal()
         }
 	}
 
@@ -186,23 +214,11 @@ import CoreFoundation
         }
 	}
 
-    private class CFRunLoopWakeupHolder: WakeableRunLoop {
-        private let loop:CFRunLoop!
-        
-        init(loop: CFRunLoop!) {
-            self.loop = loop
-        }
-        
-        func wakeUp() {
-            CFRunLoopWakeUp(loop)
-        }
-    }
-
-    class RunLoop : WakeableRunLoop {
+    class RunLoop {
 		private let cfRunLoop: CFRunLoop!
         
-        private var taskQueueSource: RunLoopSource
-        private var taskQueue: TaskQueue
+        private var taskQueueSource: RunLoopTaskQueueSource? = nil
+        private let taskQueueLock = NSLock()
 
 		#if !os(Linux)
     		static let defaultMode:NSString = "kCFRunLoopDefaultMode" as NSString
@@ -210,30 +226,16 @@ import CoreFoundation
     		static let defaultMode:NSString = "kCFRunLoopDefaultMode".bridge()
 		#endif
         
-        private static let threadKey = PThreadKey()
+        private static let threadKey = PThreadKey(destructionCallback: { loop in
+        	Unmanaged<RunLoop>.fromOpaque(COpaquePointer(loop)).release()
+        })
         
         private static let MainRunLoop = RunLoop.createMainRunLoop()
 
         init(_ cfRunLoop: CFRunLoop) {
             self.cfRunLoop = cfRunLoop
-            
-            let queue = TaskQueue()
-            
-            taskQueueSource = RunLoopSource({
-                if let element = queue.dequeue() {
-                    element.run()
-                    element.source.signal()
-                }
-            })
-            taskQueue = queue
-            addSource(taskQueueSource, mode: RunLoop.defaultMode, retainLoop: false)
         }
-        
-        deinit {
-            addTask {
-                PThread.setSpecific(nil, key: RunLoop.threadKey)
-            }
-        }
+
 		convenience init(_ runLoop: AnyObject) {
             self.init(unsafeBitCast(runLoop, CFRunLoop.self))
 		}
@@ -241,11 +243,11 @@ import CoreFoundation
         private static func createMainRunLoop() -> RunLoop {
             let runLoop = RunLoop(CFRunLoopGetMain())
             if runLoop.isCurrent() {
-                PThread.setSpecific(runLoop, key: RunLoop.threadKey)
+                PThread.setSpecific(runLoop, key: RunLoop.threadKey, retain: true)
             } else {
-                let sema = Semaphore()
+                let sema = LoopSemaphore()
                 runLoop.addTask({
-                    PThread.setSpecific(runLoop, key: RunLoop.threadKey)
+                    PThread.setSpecific(runLoop, key: RunLoop.threadKey, retain: true)
                     sema.signal()
                 })
                 sema.wait()
@@ -256,7 +258,7 @@ import CoreFoundation
 		static func currentRunLoop() -> RunLoop {
             guard let loop = PThread.getSpecific(RunLoop.threadKey) else {
                 let loop = RunLoop(CFRunLoopGetCurrent())
-                PThread.setSpecific(loop, key: RunLoop.threadKey)
+                PThread.setSpecific(loop, key: RunLoop.threadKey, retain: true)
                 return loop
             }
 			return unsafeBitCast(loop, RunLoop.self)
@@ -265,6 +267,26 @@ import CoreFoundation
 		static func mainRunLoop() -> RunLoop {
 			return MainRunLoop
 		}
+
+		func startTaskQueue(priority: Int = 1) {
+			print("Start queue called")
+			defer {
+				taskQueueLock.unlock()
+			}
+			taskQueueLock.lock()
+			self.taskQueueSource = RunLoopTaskQueueSource()
+            
+            addSource(taskQueueSource!, mode: RunLoop.defaultMode)
+		}
+
+		func stopTaskQueue() {
+			defer {
+				taskQueueLock.unlock()
+			}
+			taskQueueLock.lock()
+			self.taskQueueSource = nil
+		}
+
 
 		func isCurrent() -> Bool {
 			return cfRunLoop === CFRunLoopGetCurrent()
@@ -307,15 +329,11 @@ import CoreFoundation
 			while true { run() }
 		}
 
-        func addSource(rls: RunLoopSource, mode: NSString, retainLoop: Bool = true) {
+        func addSource(rls: RunLoopSource, mode: NSString) {
             let crls = unsafeBitCast(rls.cfObject, CFRunLoopSource.self)
             if CFRunLoopSourceIsValid(crls) {
                 CFRunLoopAddSource(cfRunLoop, crls, mode.cfString)
-                if retainLoop {
-                    rls.info.runLoops.append(self)
-                } else {
-                    rls.info.runLoops.append(CFRunLoopWakeupHolder(loop: cfRunLoop))
-                }
+                rls.info.runLoops.append(self)
                 wakeUp()
             }
         }
@@ -330,8 +348,17 @@ import CoreFoundation
 		}
         
         func addTask(task: SafeTask) {
-            taskQueue.enqueue(TaskQueueElement(task, runLoopSource: taskQueueSource))
-            taskQueueSource.signal()
+        	defer {
+        		taskQueueLock.unlock()
+        	}
+        	taskQueueLock.lock()
+        	if let queue = taskQueueSource {
+        		queue.addTask(task)
+        	} else {
+                let source = RunLoopSource(task, priority: 0, runOnce: true)
+        		addSource(source, mode: RunLoop.defaultMode)
+                source.signal()
+        	}
         }
         
         func wakeUp() {

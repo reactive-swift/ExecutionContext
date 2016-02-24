@@ -23,7 +23,7 @@ import XCTest
 
 class ExecutionContextTests: XCTestCase {
     //Tests does not create static variables. We need initialized main thread
-    let mainContext = DefaultExecutionContext.main
+    //let mainContext = DefaultExecutionContext.main
     
     func syncTest(context:ExecutionContextType) {
         let expectation = self.expectationWithDescription("OK SYNC")

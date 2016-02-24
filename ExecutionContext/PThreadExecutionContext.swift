@@ -66,11 +66,22 @@
             return Unmanaged<AnyObject>.fromOpaque(COpaquePointer(val)).takeUnretainedValue()
         }
         
-        static func setSpecific(obj: AnyObject?, key: PThreadKey) {
+        static func setSpecific(obj: AnyObject?, key: PThreadKey, retain: Bool = false) {
+            if retain {
+                let old = pthread_getspecific(key.key)
+                if old != nil {
+                    Unmanaged<AnyObject>.fromOpaque(COpaquePointer(old)).release()
+                }
+            } 
             if obj == nil {
                 pthread_setspecific(key.key, nil)
             } else {
-                pthread_setspecific(key.key, UnsafePointer<Void>(Unmanaged.passUnretained(obj!).toOpaque()))
+                if retain {
+                    print("Pass retained \(obj)")
+                    pthread_setspecific(key.key, UnsafePointer<Void>(Unmanaged.passRetained(obj!).toOpaque()))
+                } else {
+                    pthread_setspecific(key.key, UnsafePointer<Void>(Unmanaged.passUnretained(obj!).toOpaque()))
+                }
             }
         }
         
@@ -109,6 +120,7 @@
             
             PThread(task: { [unowned holder] in
                 holder.loop = RunLoop.currentRunLoop()
+                holder.loop!.startTaskQueue()
                 sema.signal()
                 RunLoop.run()
             }).start()
@@ -120,6 +132,11 @@
         
         init(runLoop:RunLoop) {
             rl = runLoop
+            rl.startTaskQueue()
+        }
+
+        deinit {
+            rl.stopTaskQueue()
         }
         
         func async(task:SafeTask) {
