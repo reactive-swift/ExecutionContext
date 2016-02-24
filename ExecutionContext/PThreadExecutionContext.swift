@@ -94,24 +94,28 @@
             return try syncThroughAsync(task)
         }
     }
+
+    // This class is workaround around release cycle in pthread run loop creation. See below in init(). Stupid ARC :(
+    private class RunLoopHolder {
+        var loop: RunLoop? = nil
+    }
     
     private class SerialContext : ExecutionContextBase, ExecutionContextType {
         private let rl:RunLoop
         
         override init() {
-            let runLoop:NSMutableArray = NSMutableArray(capacity: 1)
+            let holder = RunLoopHolder()
             let sema = Semaphore()
             
-            PThread(task: { [unowned runLoop] in
-                runLoop.addObject(RunLoop.currentRunLoop())
-                RunLoop.runWithOptions(RunLoop.defaultMode, timeout: 0, once: true)
+            PThread(task: { [unowned holder] in
+                holder.loop = RunLoop.currentRunLoop()
                 sema.signal()
                 RunLoop.run()
             }).start()
             
             sema.wait()
 
-            self.rl = runLoop.objectAtIndex(0) as! RunLoop
+            self.rl = holder.loop!
         }
         
         init(runLoop:RunLoop) {
