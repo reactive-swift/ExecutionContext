@@ -94,23 +94,28 @@
             return try syncThroughAsync(task)
         }
     }
+
+    // This class is workaround around retain cycle in pthread run loop creation. See below in init(). Stupid ARC :(
+    private class RunLoopHolder {
+        var loop: RunLoop? = nil
+    }
     
     private class SerialContext : ExecutionContextBase, ExecutionContextType {
         private let rl:RunLoop
         
         override init() {
-            var runLoop:AnyObject?
+            let holder = RunLoopHolder()
             let sema = Semaphore()
             
-            PThread(task: {
-                runLoop = RunLoop.currentCFRunLoop()
+            PThread(task: { [unowned holder] in
+                holder.loop = RunLoop.currentRunLoop()
                 sema.signal()
                 RunLoop.run()
             }).start()
             
             sema.wait()
 
-            self.rl = RunLoop(runLoop!)
+            self.rl = holder.loop!
         }
         
         init(runLoop:RunLoop) {

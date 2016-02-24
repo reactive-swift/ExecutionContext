@@ -148,9 +148,9 @@ import CoreFoundation
         func signal() {
             if _source != nil {
                 CFRunLoopSourceSignal(_source)
-                for loop in info.runLoops {
-                    loop.wakeUp()
-                }
+            }
+            for loop in info.runLoops {
+                loop.wakeUp()
             }
         }
 	}
@@ -265,10 +265,6 @@ import CoreFoundation
 		static func mainRunLoop() -> RunLoop {
 			return MainRunLoop
 		}
-        
-        static func currentCFRunLoop() -> AnyObject {
-            return CFRunLoopGetCurrent()
-        }
 
 		func isCurrent() -> Bool {
 			return cfRunLoop === CFRunLoopGetCurrent()
@@ -322,7 +318,7 @@ import CoreFoundation
                 }
                 wakeUp()
             }
-		}
+        }
 
 		func addDelay(rld: RunLoopDelay, mode: NSString) {
             let crld = unsafeBitCast(rld.cfObject, CFRunLoopTimer.self)

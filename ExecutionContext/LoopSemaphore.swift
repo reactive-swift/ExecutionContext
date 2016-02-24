@@ -1,4 +1,4 @@
-//===--- Semaphore.swift ------------------------------------------------------===//
+//===--- LoopSemaphore.swift -----------------------------------------------===//
 //Copyright (c) 2016 Daniel Leping (dileping)
 //
 //Licensed under the Apache License, Version 2.0 (the "License");
@@ -16,41 +16,43 @@
 
 import Foundation
 
-import Dispatch
+#if !os(Linux)
+    import Dispatch
 
-public class DispatchLoopSemaphore : SemaphoreType {
-    let sema:dispatch_semaphore_t
+    public class DispatchLoopSemaphore : SemaphoreType {
+        let sema:dispatch_semaphore_t
     
-    public required convenience init() {
-        self.init(value: 0)
-    }
-    
-    public required init(value: Int) {
-        self.sema = dispatch_semaphore_create(value)
-    }
-    
-    public func wait() -> Bool {
-        return dispatch_semaphore_wait(sema, DISPATCH_TIME_FOREVER) == 0
-    }
-    
-    public func wait(until:NSDate?) -> Bool {
-        let timeout = until?.timeIntervalSinceNow
-        return wait(timeout)
-    }
-    
-    public func wait(timeout: Double?) -> Bool {
-        guard let timeout = timeout else {
-            return wait()
+        public required convenience init() {
+            self.init(value: 0)
         }
-        let time = dispatch_time(DISPATCH_TIME_NOW, Int64(timeout * NSTimeInterval(NSEC_PER_SEC)))
-        let result = dispatch_semaphore_wait(sema, time)
-        return result == 0
-    }
     
-    public func signal() -> Int {
-        return dispatch_semaphore_signal(sema)
+        public required init(value: Int) {
+            self.sema = dispatch_semaphore_create(value)
+        }
+    
+        public func wait() -> Bool {
+            return dispatch_semaphore_wait(sema, DISPATCH_TIME_FOREVER) == 0
+        }
+    
+        public func wait(until:NSDate?) -> Bool {
+            let timeout = until?.timeIntervalSinceNow
+            return wait(timeout)
+        }
+    
+        public func wait(timeout: Double?) -> Bool {
+            guard let timeout = timeout else {
+                return wait()
+            }
+            let time = dispatch_time(DISPATCH_TIME_NOW, Int64(timeout * NSTimeInterval(NSEC_PER_SEC)))
+            let result = dispatch_semaphore_wait(sema, time)
+            return result == 0
+        }
+    
+        public func signal() -> Int {
+            return dispatch_semaphore_signal(sema)
+        }
     }
-}
+#endif
 
 extension Optional {
     func getOrElse(@autoclosure f:()->Wrapped) -> Wrapped {
@@ -105,7 +107,7 @@ public class CFRunLoopSemaphore : SemaphoreType {
         while value <= 0 {
             while !self.signaled && !timedout {
                 RunLoop.runUntilOnce(RunLoop.defaultMode, until: until)
-                timedout = !until.isGreaterThan(NSDate())
+                timedout = until.timeIntervalSinceNow <= 0
             }
             if timedout {
                 break
