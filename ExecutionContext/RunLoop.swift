@@ -332,7 +332,6 @@ import CoreFoundation
         func addTask(task: SafeTask) {
             taskQueue.enqueue(TaskQueueElement(task, runLoopSource: taskQueueSource))
             taskQueueSource.signal()
-            wakeUp()
         }
         
         func wakeUp() {
