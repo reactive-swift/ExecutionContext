@@ -15,6 +15,9 @@
 //===----------------------------------------------------------------------===//
 
 import Foundation
+#if os(Linux)
+import CoreFoundation
+#endif
 
 #if !os(Linux)
     import Dispatch
@@ -79,8 +82,13 @@ public class CFRunLoopSemaphore : SemaphoreType {
         self.source = RunLoopSource( { [unowned self] in
             self.signaled = true
             self.value += 1
-        }, priority: 1)
-        RunLoop.currentRunLoop().addSource(source!, mode: RunLoop.defaultMode)
+            // On linux timeout not working in run loop
+            #if os(Linux)
+                CFRunLoopStop(CFRunLoopGetCurrent())
+            #endif
+        }, priority: 2)
+        let loop:RunLoop = RunLoop.currentRunLoop()
+        loop.addSource(source!, mode: RunLoop.defaultMode)
     }
     
     /// Creates a new semaphore with initial value 0

@@ -22,6 +22,7 @@ let package = Package(
         Target(
             name: "ExecutionContext"
         ),
+        Target(name:"ECTest", dependencies:[.Target(name: "ExecutionContext")])
     ],
     dependencies: [.Package(url: "https://github.com/crossroadlabs/Result.git", majorVersion: 1)]
 )
