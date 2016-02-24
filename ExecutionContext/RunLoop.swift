@@ -123,8 +123,8 @@ import CoreFoundation
                         copyDescription: nil,
                         equal: nil,
                         hash: nil,
-                        schedule: {(info, loop, mode) in print("Scheduled in \(loop)") },
-                        cancel: {(info, loop, mode) in print("Removed \(loop)") },
+                        schedule: nil,
+                        cancel: nil,
                         perform: runLoopCallbackInfoRun
                     )
                     _source = CFRunLoopSourceCreate(nil, -priority, &context)
@@ -317,10 +317,8 @@ import CoreFoundation
                     rls.info.runLoops.append(CFRunLoopWakeupHolder(loop: cfRunLoop))
                 }
                 wakeUp()
-            } else {
-                print("!!!!!!!!!!!!!NOT VALID!!!!!!!!!!")
             }
-		}
+        }
 
 		func addDelay(rld: RunLoopDelay, mode: NSString) {
             let crld = unsafeBitCast(rld.cfObject, CFRunLoopTimer.self)
