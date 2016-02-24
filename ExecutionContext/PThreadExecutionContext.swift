@@ -95,7 +95,7 @@
         }
     }
 
-    // This class is workaround around release cycle in pthread run loop creation. See below in init(). Stupid ARC :(
+    // This class is workaround around retain cycle in pthread run loop creation. See below in init(). Stupid ARC :(
     private class RunLoopHolder {
         var loop: RunLoop? = nil
     }
