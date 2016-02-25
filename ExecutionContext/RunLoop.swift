@@ -219,6 +219,10 @@ import CoreFoundation
         }
 	}
 
+    private func runLoopTLRelease(rl : UnsafeMutablePointer<Void>) {
+        Unmanaged<RunLoop>.fromOpaque(COpaquePointer(rl)).release()
+    }
+
     class RunLoop {
 		private let cfRunLoop: CFRunLoop!
         
@@ -231,10 +235,7 @@ import CoreFoundation
     		static let defaultMode:NSString = "kCFRunLoopDefaultMode".bridge()
 		#endif
         
-        private static let threadKey = PThreadKey(destructionCallback: { loop in
-        	Unmanaged<RunLoop>.fromOpaque(COpaquePointer(loop)).release()
-            print("run loop destruction callback")
-        })
+        private static let threadKey = PThreadKey(destructionCallback: runLoopTLRelease)
         
         private static let threadLocalLock = NSLock()
         private static let MainRunLoop = RunLoop.createMainRunLoop()
