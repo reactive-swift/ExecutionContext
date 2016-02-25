@@ -144,4 +144,8 @@ public class CFRunLoopSemaphore : SemaphoreType {
     }
 }
 
-public typealias LoopSemaphore = CFRunLoopSemaphore
+#if os(Linux)
+    public typealias LoopSemaphore = CFRunLoopSemaphore
+#else
+    public typealias LoopSemaphore = DispatchLoopSemaphore
+#endif
