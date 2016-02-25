@@ -77,7 +77,6 @@
                 pthread_setspecific(key.key, nil)
             } else {
                 if retain {
-                    print("Pass retained \(obj)")
                     pthread_setspecific(key.key, UnsafePointer<Void>(Unmanaged.passRetained(obj!).toOpaque()))
                 } else {
                     pthread_setspecific(key.key, UnsafePointer<Void>(Unmanaged.passUnretained(obj!).toOpaque()))

@@ -230,6 +230,7 @@ import CoreFoundation
         	Unmanaged<RunLoop>.fromOpaque(COpaquePointer(loop)).release()
         })
         
+        private static let threadLocalLock = NSLock()
         private static let MainRunLoop = RunLoop.createMainRunLoop()
 
         init(_ cfRunLoop: CFRunLoop) {
@@ -241,11 +242,16 @@ import CoreFoundation
 		}
         
         private static func createMainRunLoop() -> RunLoop {
+            defer {
+                RunLoop.threadLocalLock.unlock()
+            }
+
+            RunLoop.threadLocalLock.lock()
             let runLoop = RunLoop(CFRunLoopGetMain())
             if runLoop.isCurrent() {
                 PThread.setSpecific(runLoop, key: RunLoop.threadKey, retain: true)
             } else {
-                let sema = LoopSemaphore()
+                let sema = Semaphore()
                 runLoop.addTask({
                     PThread.setSpecific(runLoop, key: RunLoop.threadKey, retain: true)
                     sema.signal()
@@ -256,6 +262,10 @@ import CoreFoundation
         }
 
 		static func currentRunLoop() -> RunLoop {
+            defer {
+                RunLoop.threadLocalLock.unlock()
+            }
+            RunLoop.threadLocalLock.lock()
             guard let loop = PThread.getSpecific(RunLoop.threadKey) else {
                 let loop = RunLoop(CFRunLoopGetCurrent())
                 PThread.setSpecific(loop, key: RunLoop.threadKey, retain: true)
@@ -269,7 +279,6 @@ import CoreFoundation
 		}
 
 		func startTaskQueue(priority: Int = 1) {
-			print("Start queue called")
 			defer {
 				taskQueueLock.unlock()
 			}
