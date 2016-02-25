@@ -67,11 +67,13 @@ import CoreFoundation
             if head == nil {
                 tail = nil
             }
+            elem?.next = nil
             return elem
         }
     }
 
 	private class RunLoopCallbackInfo {
+        private let lock = NSLock()
 		private let task: SafeTask
 		private var runLoops: [RunLoop] = []
 
@@ -82,6 +84,24 @@ import CoreFoundation
 		func run() {
 			task()
 		}
+        
+        func addRunLoop(rl: RunLoop) {
+            defer {
+                lock.unlock()
+            }
+            lock.lock()
+            runLoops.append(rl)
+        }
+        
+        func removeRunLoop(rl: RunLoop) {
+            defer {
+                lock.unlock()
+            }
+            lock.lock()
+            if let index = runLoops.indexOf(rl) {
+                runLoops.removeAtIndex(index)
+            }
+        }
 	}
 
 	private func runLoopCallbackInfoRun(i: UnsafeMutablePointer<Void>) {
@@ -158,9 +178,13 @@ import CoreFoundation
         func signal() {
             if _source != nil {
                 CFRunLoopSourceSignal(_source)
-            }
-            for loop in info.runLoops {
-                loop.wakeUp()
+                info.lock.lock()
+                defer {
+                    info.lock.unlock()
+                }
+                for loop in info.runLoops {
+                    loop.wakeUp()
+                }
             }
         }
 	}
@@ -214,6 +238,10 @@ import CoreFoundation
         }
 	}
 
+    private func runLoopTLRelease(rl : UnsafeMutablePointer<Void>) {
+        Unmanaged<RunLoop>.fromOpaque(COpaquePointer(rl)).release()
+    }
+
     class RunLoop {
 		private let cfRunLoop: CFRunLoop!
         
@@ -226,9 +254,7 @@ import CoreFoundation
     		static let defaultMode:NSString = "kCFRunLoopDefaultMode".bridge()
 		#endif
         
-        private static let threadKey = PThreadKey(destructionCallback: { loop in
-        	Unmanaged<RunLoop>.fromOpaque(COpaquePointer(loop)).release()
-        })
+        private static let threadKey = PThreadKey(destructionCallback: runLoopTLRelease)
         
         private static let threadLocalLock = NSLock()
         private static let MainRunLoop = RunLoop.createMainRunLoop()
@@ -346,7 +372,7 @@ import CoreFoundation
             let crls = unsafeBitCast(rls.cfObject, CFRunLoopSource.self)
             if CFRunLoopSourceIsValid(crls) {
                 CFRunLoopAddSource(cfRunLoop, crls, mode.cfString)
-                rls.info.runLoops.append(self)
+                rls.info.addRunLoop(self)
                 wakeUp()
             }
         }
@@ -355,9 +381,7 @@ import CoreFoundation
             let crls = unsafeBitCast(rls.cfObject, CFRunLoopSource.self)
             if CFRunLoopSourceIsValid(crls) {
                 CFRunLoopRemoveSource(cfRunLoop, crls, mode.cfString)
-                if let index = rls.info.runLoops.indexOf(self) {
-                    rls.info.runLoops.removeAtIndex(index)
-                }
+                rls.info.removeRunLoop(self)
                 wakeUp()
             }
         }
@@ -366,7 +390,7 @@ import CoreFoundation
             let crld = unsafeBitCast(rld.cfObject, CFRunLoopTimer.self)
             if CFRunLoopTimerIsValid(crld) && (rld.info.runLoops.count == 0 || rld.info.runLoops[0] === self) {
                 CFRunLoopAddTimer(cfRunLoop, crld, mode.cfString)
-                rld.info.runLoops.append(self)
+                rld.info.addRunLoop(self)
                 wakeUp()
             }
 		}
