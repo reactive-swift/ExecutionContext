@@ -142,6 +142,10 @@ class ExecutionContextTests: XCTestCase {
         var n = 0
         for _ in [0...100] {
             global.execute {
+                sema.willUse()
+                defer {
+                    sema.didUse()
+                }
                 sema.wait()
                 XCTAssert(n == 0, "Should always be zero")
                 n += 1
