@@ -67,6 +67,7 @@ import CoreFoundation
             if head == nil {
                 tail = nil
             }
+            elem?.next = nil
             return elem
         }
     }
