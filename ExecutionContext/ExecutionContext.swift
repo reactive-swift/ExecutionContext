@@ -17,7 +17,7 @@
 import Foundation
 import Result
 
-#if !os(Linux) || DISPATCH
+#if !os(Linux) || dispatch
     import Dispatch
 #endif
 
@@ -167,7 +167,7 @@ public func sleep(timeout:Double) {
 }
 
 @noreturn public func executionContextMain() {
-    #if !os(Linux) || DISPATCH
+    #if !os(Linux) || dispatch
         dispatch_main()
     #else
         RunLoop.runForever()

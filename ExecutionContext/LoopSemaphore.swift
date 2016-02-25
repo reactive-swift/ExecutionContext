@@ -17,7 +17,7 @@
 import Foundation
 import CoreFoundation
 
-#if !os(Linux) || DISPATCH
+#if !os(Linux) || dispatch
     import Dispatch
 
     public class DispatchLoopSemaphore : SemaphoreType {
@@ -142,7 +142,7 @@ public class CFRunLoopSemaphore : SemaphoreType {
     }
 }
 
-#if !os(Linux) || DISPATCH
+#if !os(Linux) || dispatch
     public typealias LoopSemaphore = DispatchLoopSemaphore
 #else
     public typealias LoopSemaphore = CFRunLoopSemaphore

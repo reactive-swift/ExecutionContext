@@ -16,7 +16,7 @@
 
 import Foundation
 
-#if !os(Linux) || DISPATCH
+#if !os(Linux) || dispatch
     
     public typealias DefaultExecutionContext = DispatchExecutionContext
     
