@@ -17,6 +17,10 @@
 import Foundation
 import Result
 
+#if !os(Linux) || DISPATCH
+    import Dispatch
+#endif
+
 public typealias Task = () throws -> Void
 public typealias SafeTask = () -> Void
 
@@ -163,9 +167,9 @@ public func sleep(timeout:Double) {
 }
 
 @noreturn public func executionContextMain() {
-    //#if os(Linux)
+    #if !os(Linux) || DISPATCH
+        dispatch_main()
+    #else
         RunLoop.runForever()
-    //#else
-    //    dispatch_main()
-    //#endif
+    #endif
 }

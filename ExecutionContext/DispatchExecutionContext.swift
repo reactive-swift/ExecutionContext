@@ -14,7 +14,7 @@
 //limitations under the License.
 //===----------------------------------------------------------------------===//
 
-#if !os(Linux)
+#if !os(Linux) || DISPATCH
     
     import Foundation
     import Dispatch
