@@ -228,6 +228,7 @@ import CoreFoundation
         
         private static let threadKey = PThreadKey(destructionCallback: { loop in
         	Unmanaged<RunLoop>.fromOpaque(COpaquePointer(loop)).release()
+            print("run loop destruction callback")
         })
         
         private static let threadLocalLock = NSLock()
