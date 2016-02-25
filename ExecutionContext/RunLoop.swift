@@ -33,6 +33,10 @@ import CoreFoundation
             self.source = runLoopSource
         }
         
+        deinit {
+            print("Task deinit")
+        }
+        
         func run() {
             task()
         }
