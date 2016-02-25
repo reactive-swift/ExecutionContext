@@ -129,7 +129,11 @@ extension ExecutionContextType {
     func syncThroughAsync<ReturnType>(task:() throws -> ReturnType) throws -> ReturnType {
         var result:Result<ReturnType, AnyError>?
         
-        let sema = Semaphore()
+        let sema = LoopSemaphore()
+        sema.willUse()
+        defer {
+            sema.didUse()
+        }
         
         async {
             result = materialize(task)
@@ -159,9 +163,9 @@ public func sleep(timeout:Double) {
 }
 
 @noreturn public func executionContextMain() {
-    #if os(Linux)
+    //#if os(Linux)
         RunLoop.runForever()
-    #else
-        dispatch_main()
-    #endif
+    //#else
+    //    dispatch_main()
+    //#endif
 }

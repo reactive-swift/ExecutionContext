@@ -30,8 +30,18 @@
         pthread.task?()
         return nil
     }
-    
-    private class PThread {
+
+    internal class PThreadKey {
+        private var key: pthread_key_t = 0
+        init(destructionCallback: (@convention(c) UnsafeMutablePointer<Void> -> Void)! = nil) {
+            pthread_key_create(&key, destructionCallback)
+        }
+        deinit {
+            pthread_key_delete(key)
+        }
+    }
+
+    internal class PThread {
         let thread: UnsafeMutablePointer<pthread_t>
         let task:SafeTask?
         
@@ -47,6 +57,33 @@
         func start() {
             pthread_create(thread, nil, thread_proc, UnsafeMutablePointer<Void>(Unmanaged.passRetained(self).toOpaque()))
         }
+        
+        static func getSpecific(key: PThreadKey) -> AnyObject? {
+            let val = pthread_getspecific(key.key)
+            if val == nil {
+                return nil
+            }
+            return Unmanaged<AnyObject>.fromOpaque(COpaquePointer(val)).takeUnretainedValue()
+        }
+        
+        static func setSpecific(obj: AnyObject?, key: PThreadKey, retain: Bool = false) {
+            if retain {
+                let old = pthread_getspecific(key.key)
+                if old != nil {
+                    Unmanaged<AnyObject>.fromOpaque(COpaquePointer(old)).release()
+                }
+            } 
+            if obj == nil {
+                pthread_setspecific(key.key, nil)
+            } else {
+                if retain {
+                    pthread_setspecific(key.key, UnsafePointer<Void>(Unmanaged.passRetained(obj!).toOpaque()))
+                } else {
+                    pthread_setspecific(key.key, UnsafePointer<Void>(Unmanaged.passUnretained(obj!).toOpaque()))
+                }
+            }
+        }
+        
     }
     
     private class ParallelContext : ExecutionContextBase, ExecutionContextType {
@@ -67,31 +104,46 @@
             return try syncThroughAsync(task)
         }
     }
+
+    // This class is workaround around retain cycle in pthread run loop creation. See below in init(). Stupid ARC :(
+    private class RunLoopHolder {
+        var loop: RunLoop? = nil
+    }
     
     private class SerialContext : ExecutionContextBase, ExecutionContextType {
         private let rl:RunLoop
         
         override init() {
-            var runLoop:RunLoop?
+            let holder = RunLoopHolder()
             let sema = Semaphore()
+            sema.willUse()
+            defer {
+                sema.didUse()
+            }
             
-            PThread(task: {
-                runLoop = RunLoop.currentRunLoop(true)
+            PThread(task: { [unowned holder] in
+                holder.loop = RunLoop.currentRunLoop()
+                holder.loop!.startTaskQueue()
                 sema.signal()
                 RunLoop.run()
             }).start()
             
             sema.wait()
 
-            self.rl = runLoop!
+            self.rl = holder.loop!
         }
         
         init(runLoop:RunLoop) {
             rl = runLoop
+            rl.startTaskQueue()
+        }
+
+        deinit {
+            rl.stopTaskQueue()
         }
         
         func async(task:SafeTask) {
-            rl.addSource(RunLoopSource(task), mode: RunLoop.defaultMode)
+            rl.addTask(task)
         }
         
         func async(after:Double, task:SafeTask) {

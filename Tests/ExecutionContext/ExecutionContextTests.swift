@@ -22,6 +22,8 @@ import XCTest
 #endif
 
 class ExecutionContextTests: XCTestCase {
+    //Tests does not create static variables. We need initialized main thread
+    //let mainContext = DefaultExecutionContext.main
     
     func syncTest(context:ExecutionContextType) {
         let expectation = self.expectationWithDescription("OK SYNC")
@@ -30,7 +32,7 @@ class ExecutionContextTests: XCTestCase {
             expectation.fulfill()
         }
         
-        self.waitForExpectationsWithTimeout(1, handler: nil)
+        self.waitForExpectationsWithTimeout(0, handler: nil)
     }
     
     func asyncTest(context:ExecutionContextType) {
@@ -136,10 +138,14 @@ class ExecutionContextTests: XCTestCase {
     }
     
     func testSemaphore() {
-        let sema = Semaphore()
+        let sema = Semaphore(value: 1)
         var n = 0
         for _ in [0...100] {
             global.execute {
+                sema.willUse()
+                defer {
+                    sema.didUse()
+                }
                 sema.wait()
                 XCTAssert(n == 0, "Should always be zero")
                 n += 1

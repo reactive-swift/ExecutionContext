@@ -23,17 +23,85 @@ import CoreFoundation
         var cfString: CFString { return unsafeBitCast(self, CFString.self) }
     }
 
+    private class TaskQueueElement {
+        private let task : SafeTask
+        private let source: RunLoopSource
+        var next: TaskQueueElement? = nil
+        
+        init(_ task: SafeTask, runLoopSource: RunLoopSource) {
+            self.task = task
+            self.source = runLoopSource
+        }
+        
+        func run() {
+            task()
+        }
+    }
+
+    private class TaskQueue {
+        private let lock = NSLock()
+        private var head:TaskQueueElement? = nil
+        private var tail:TaskQueueElement? = nil
+        
+        func enqueue(elem: TaskQueueElement) {
+            defer {
+                lock.unlock()
+            }
+            lock.lock()
+            if tail == nil {
+                head = elem
+                tail = elem
+            } else {
+                tail!.next = elem
+                tail = elem
+            }
+        }
+        
+        func dequeue() -> TaskQueueElement? {
+            defer {
+                lock.unlock()
+            }
+            lock.lock()
+            let elem = head
+            head = head?.next
+            if head == nil {
+                tail = nil
+            }
+            elem?.next = nil
+            return elem
+        }
+    }
+
 	private class RunLoopCallbackInfo {
-		private var task: SafeTask
+        private let lock = NSLock()
+		private let task: SafeTask
 		private var runLoops: [RunLoop] = []
 
-		init(_ task: SafeTask) {
+        init(_ task: SafeTask) {
 			self.task = task
-		}
+        }
 
 		func run() {
 			task()
 		}
+        
+        func addRunLoop(rl: RunLoop) {
+            defer {
+                lock.unlock()
+            }
+            lock.lock()
+            runLoops.append(rl)
+        }
+        
+        func removeRunLoop(rl: RunLoop) {
+            defer {
+                lock.unlock()
+            }
+            lock.lock()
+            if let index = runLoops.indexOf(rl) {
+                runLoops.removeAtIndex(index)
+            }
+        }
 	}
 
 	private func runLoopCallbackInfoRun(i: UnsafeMutablePointer<Void>) {
@@ -52,7 +120,7 @@ import CoreFoundation
 
 	private protocol RunLoopCallback {
 		var info : RunLoopCallbackInfo { get }
-		var cfObject: AnyObject { mutating get }
+		var cfObject: AnyObject { get }
 	}
 
 	class RunLoopSource : RunLoopCallback {
@@ -75,16 +143,68 @@ import CoreFoundation
                         cancel: nil,
                         perform: runLoopCallbackInfoRun
                     )
-                    _source = CFRunLoopSourceCreate(nil, priority, &context)
+                    _source = CFRunLoopSourceCreate(nil, -priority, &context)
                 }
                 return _source
             }
 		}
 
-		init(_ task: SafeTask, priority: Int = 0) {
-			self.info = RunLoopCallbackInfo(task)
-			self.priority = priority
+        init(_ task: SafeTask, priority: Int = 0, runOnce: Bool = false) {
+            self.priority = priority
+            if runOnce {
+                var stopTask:SafeTask?
+                self.info = RunLoopCallbackInfo({
+                    task()
+                    stopTask?()
+                })
+                stopTask = { self.stop() }
+            } else {
+                self.info = RunLoopCallbackInfo(task)
+            }
+			
 		}
+        
+        deinit {
+            stop()
+        }
+
+        func stop() {
+        	if _source != nil && CFRunLoopSourceIsValid(_source) {
+                CFRunLoopSourceInvalidate(_source)
+                _source = nil
+            }
+        }
+        
+        func signal() {
+            if _source != nil {
+                CFRunLoopSourceSignal(_source)
+                info.lock.lock()
+                defer {
+                    info.lock.unlock()
+                }
+                for loop in info.runLoops {
+                    loop.wakeUp()
+                }
+            }
+        }
+	}
+
+	class RunLoopTaskQueueSource : RunLoopSource {
+		private let queue = TaskQueue()
+
+		init(priority: Int = 1) {
+			super.init({ [unowned queue] in
+                if let element = queue.dequeue() {
+                    element.run()
+                    element.source.signal()
+                }
+            }, priority: priority)
+		}
+
+		func addTask(task: SafeTask) {
+            queue.enqueue(TaskQueueElement(task, runLoopSource: self))
+            self.signal()
+        }
 	}
 
 	private func timerRunCallback(timer: CFRunLoopTimer!, i: UnsafeMutablePointer<Void>) {
@@ -118,34 +238,94 @@ import CoreFoundation
         }
 	}
 
-	class RunLoop {
+    private func runLoopTLRelease(rl : UnsafeMutablePointer<Void>) {
+        Unmanaged<RunLoop>.fromOpaque(COpaquePointer(rl)).release()
+    }
+
+    class RunLoop {
 		private let cfRunLoop: CFRunLoop!
-		private let autoStop: Bool
+        
+        private var taskQueueSource: RunLoopTaskQueueSource? = nil
+        private let taskQueueLock = NSLock()
 
 		#if !os(Linux)
     		static let defaultMode:NSString = "kCFRunLoopDefaultMode" as NSString
 		#else
     		static let defaultMode:NSString = "kCFRunLoopDefaultMode".bridge()
 		#endif
+        
+        private static let threadKey = PThreadKey(destructionCallback: runLoopTLRelease)
+        
+        private static let threadLocalLock = NSLock()
+        private static let MainRunLoop = RunLoop.createMainRunLoop()
 
-		init(_ runLoop: CFRunLoop, autoStop: Bool = true) {
-			self.cfRunLoop = runLoop
-			self.autoStop = autoStop
+        init(_ cfRunLoop: CFRunLoop) {
+            self.cfRunLoop = cfRunLoop
+        }
+
+		convenience init(_ runLoop: AnyObject) {
+            self.init(unsafeBitCast(runLoop, CFRunLoop.self))
 		}
+        
+        private static func createMainRunLoop() -> RunLoop {
+            defer {
+                RunLoop.threadLocalLock.unlock()
+            }
 
-		deinit {
-			if autoStop && cfRunLoop != nil {
-				CFRunLoopStop(cfRunLoop)
-			}
-		}
+            RunLoop.threadLocalLock.lock()
+            let runLoop = RunLoop(CFRunLoopGetMain())
+            if runLoop.isCurrent() {
+                PThread.setSpecific(runLoop, key: RunLoop.threadKey, retain: true)
+            } else {
+                let sema = Semaphore()
+                sema.willUse()
+                defer {
+                    sema.didUse()
+                }
+                runLoop.addTask({
+                    PThread.setSpecific(runLoop, key: RunLoop.threadKey, retain: true)
+                    sema.signal()
+                })
+                sema.wait()
+            }
+            return runLoop
+        }
 
-		static func currentRunLoop(autoStop: Bool = false) -> RunLoop {
-			return RunLoop(CFRunLoopGetCurrent(), autoStop: autoStop)
+		static func currentRunLoop() -> RunLoop {
+            defer {
+                RunLoop.threadLocalLock.unlock()
+            }
+            RunLoop.threadLocalLock.lock()
+            guard let loop = PThread.getSpecific(RunLoop.threadKey) else {
+                let loop = RunLoop(CFRunLoopGetCurrent())
+                PThread.setSpecific(loop, key: RunLoop.threadKey, retain: true)
+                return loop
+            }
+			return unsafeBitCast(loop, RunLoop.self)
 		}
 
 		static func mainRunLoop() -> RunLoop {
-			return RunLoop(CFRunLoopGetMain(), autoStop: false)
+			return MainRunLoop
 		}
+
+		func startTaskQueue(priority: Int = 1) {
+			defer {
+				taskQueueLock.unlock()
+			}
+			taskQueueLock.lock()
+			self.taskQueueSource = RunLoopTaskQueueSource()
+            
+            addSource(taskQueueSource!, mode: RunLoop.defaultMode)
+		}
+
+		func stopTaskQueue() {
+			defer {
+				taskQueueLock.unlock()
+			}
+			taskQueueLock.lock()
+			self.taskQueueSource = nil
+		}
+
 
 		func isCurrent() -> Bool {
 			return cfRunLoop === CFRunLoopGetCurrent()
@@ -154,30 +334,90 @@ import CoreFoundation
 		static func run() {
 			runInMode(RunLoop.defaultMode)
 		}
+        
+        static func runUntil(mode: NSString, until:NSDate) {
+            RunLoop.runWithTimeout(mode, timeout: until.timeIntervalSinceNow)
+        }
+        
+        static func runUntilOnce(mode: NSString, until:NSDate) {
+            RunLoop.runWithOptions(mode, timeout: until.timeIntervalSinceNow, once: true)
+        }
+        
+        static func runWithOptions(mode: NSString, timeout:NSTimeInterval, once:Bool) {
+            #if !os(Linux)
+                //var result:CFRunLoopRunResult
+                //result =
+                CFRunLoopRunInMode(mode.cfString, timeout, once)
+            #else
+                //var result:Int32
+                //result =
+                CFRunLoopRunInMode(mode.cfString, timeout, once)
+                //Int32(kCFRunLoopRunStopped)
+            #endif
+        }
+        
+        static func runWithTimeout(mode: NSString, timeout:NSTimeInterval) {
+            RunLoop.runWithOptions(mode, timeout: timeout, once: false)
+        }
 
 		static func runInMode(mode: NSString) {
-			#if !os(Linux)
-				while CFRunLoopRunInMode(mode.cfString, Double.infinity, false) != .Stopped {}
-			#else
-				while CFRunLoopRunInMode(mode.cfString, Double.infinity, false) != Int32(kCFRunLoopRunStopped) {}
-			#endif
+            RunLoop.runWithTimeout(mode, timeout: Double.infinity)
 		}
 
 		@noreturn static func runForever() {
 			while true { run() }
 		}
 
-		func addSource(rls: RunLoopSource, mode: NSString) {
-			rls.info.runLoops.append(self)
-			CFRunLoopAddSource(cfRunLoop, unsafeBitCast(rls.cfObject, CFRunLoopSource.self), mode.cfString)
-			CFRunLoopSourceSignal(unsafeBitCast(rls.cfObject, CFRunLoopSource.self))
-			CFRunLoopWakeUp(cfRunLoop)
-		}
+        func addSource(rls: RunLoopSource, mode: NSString) {
+            let crls = unsafeBitCast(rls.cfObject, CFRunLoopSource.self)
+            if CFRunLoopSourceIsValid(crls) {
+                CFRunLoopAddSource(cfRunLoop, crls, mode.cfString)
+                rls.info.addRunLoop(self)
+                wakeUp()
+            }
+        }
+        
+        func removeSource(rls: RunLoopSource, mode: NSString) {
+            let crls = unsafeBitCast(rls.cfObject, CFRunLoopSource.self)
+            if CFRunLoopSourceIsValid(crls) {
+                CFRunLoopRemoveSource(cfRunLoop, crls, mode.cfString)
+                rls.info.removeRunLoop(self)
+                wakeUp()
+            }
+        }
 
 		func addDelay(rld: RunLoopDelay, mode: NSString) {
-			rld.info.runLoops.append(self)
-			CFRunLoopAddTimer(cfRunLoop, unsafeBitCast(rld.cfObject, CFRunLoopTimer.self), mode.cfString)
-			CFRunLoopWakeUp(cfRunLoop)
+            let crld = unsafeBitCast(rld.cfObject, CFRunLoopTimer.self)
+            if CFRunLoopTimerIsValid(crld) && (rld.info.runLoops.count == 0 || rld.info.runLoops[0] === self) {
+                CFRunLoopAddTimer(cfRunLoop, crld, mode.cfString)
+                rld.info.addRunLoop(self)
+                wakeUp()
+            }
 		}
+        
+        func addTask(task: SafeTask) {
+        	defer {
+        		taskQueueLock.unlock()
+        	}
+        	taskQueueLock.lock()
+        	if let queue = taskQueueSource {
+        		queue.addTask(task)
+        	} else {
+                let source = RunLoopSource(task, priority: 0, runOnce: true)
+        		addSource(source, mode: RunLoop.defaultMode)
+                source.signal()
+        	}
+        }
+        
+        func wakeUp() {
+            CFRunLoopWakeUp(cfRunLoop)
+        }
 	}
+
+    extension RunLoop : Equatable {
+    }
+
+    func ==(lhs: RunLoop, rhs: RunLoop) -> Bool {
+        return lhs.cfRunLoop === rhs.cfRunLoop
+    }
 //#endif
