@@ -130,6 +130,10 @@ extension ExecutionContextType {
         var result:Result<ReturnType, AnyError>?
         
         let sema = LoopSemaphore()
+        sema.willUse()
+        defer {
+            sema.didUse()
+        }
         
         async {
             result = materialize(task)

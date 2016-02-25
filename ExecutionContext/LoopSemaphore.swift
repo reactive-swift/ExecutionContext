@@ -87,8 +87,6 @@ public class CFRunLoopSemaphore : SemaphoreType {
                 CFRunLoopStop(CFRunLoopGetCurrent())
             #endif
         }, priority: 2)
-        let loop:RunLoop = RunLoop.currentRunLoop()
-        loop.addSource(source!, mode: RunLoop.defaultMode)
     }
     
     /// Creates a new semaphore with initial value 0
@@ -133,6 +131,16 @@ public class CFRunLoopSemaphore : SemaphoreType {
     public func signal() -> Int {
         source?.signal()
         return value
+    }
+    
+    public func willUse() {
+        let loop:RunLoop = RunLoop.currentRunLoop()
+        loop.addSource(source!, mode: RunLoop.defaultMode)
+    }
+    
+    public func didUse() {
+        let loop:RunLoop = RunLoop.currentRunLoop()
+        loop.removeSource(source!, mode: RunLoop.defaultMode)
     }
 }
 

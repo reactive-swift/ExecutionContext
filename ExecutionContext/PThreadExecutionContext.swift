@@ -116,6 +116,10 @@
         override init() {
             let holder = RunLoopHolder()
             let sema = Semaphore()
+            sema.willUse()
+            defer {
+                sema.didUse()
+            }
             
             PThread(task: { [unowned holder] in
                 holder.loop = RunLoop.currentRunLoop()

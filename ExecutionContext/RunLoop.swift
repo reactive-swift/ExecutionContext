@@ -252,6 +252,10 @@ import CoreFoundation
                 PThread.setSpecific(runLoop, key: RunLoop.threadKey, retain: true)
             } else {
                 let sema = Semaphore()
+                sema.willUse()
+                defer {
+                    sema.didUse()
+                }
                 runLoop.addTask({
                     PThread.setSpecific(runLoop, key: RunLoop.threadKey, retain: true)
                     sema.signal()
@@ -346,6 +350,17 @@ import CoreFoundation
                 wakeUp()
             }
         }
+        
+        func removeSource(rls: RunLoopSource, mode: NSString) {
+            let crls = unsafeBitCast(rls.cfObject, CFRunLoopSource.self)
+            if CFRunLoopSourceIsValid(crls) {
+                CFRunLoopRemoveSource(cfRunLoop, crls, mode.cfString)
+                if let index = rls.info.runLoops.indexOf(self) {
+                    rls.info.runLoops.removeAtIndex(index)
+                }
+                wakeUp()
+            }
+        }
 
 		func addDelay(rld: RunLoopDelay, mode: NSString) {
             let crld = unsafeBitCast(rld.cfObject, CFRunLoopTimer.self)
@@ -374,4 +389,11 @@ import CoreFoundation
             CFRunLoopWakeUp(cfRunLoop)
         }
 	}
+
+    extension RunLoop : Equatable {
+    }
+
+    func ==(lhs: RunLoop, rhs: RunLoop) -> Bool {
+        return lhs.cfRunLoop === rhs.cfRunLoop
+    }
 //#endif

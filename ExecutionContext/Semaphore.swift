@@ -105,3 +105,11 @@ public class Semaphore : SemaphoreType {
         return value
     }
 }
+
+public extension SemaphoreType {
+    public func willUse() {
+    }
+    
+    public func didUse() {
+    }
+}
