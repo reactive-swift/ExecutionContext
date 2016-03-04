@@ -17,6 +17,10 @@
 import Foundation
 import Result
 
+#if os(Linux)
+    import Glibc
+#endif
+
 #if !os(Linux) || dispatch
     import Dispatch
 #endif
