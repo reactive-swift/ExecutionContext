@@ -118,7 +118,7 @@ class ExecutionContextTests: XCTestCase {
     }
     
     func testCustomOnMain() {
-        let context = executionContext(global.execute)
+        let context = executionContext(main.execute)
         
         syncTest(context)
         asyncTest(context)
