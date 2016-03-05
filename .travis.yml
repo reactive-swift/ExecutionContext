@@ -45,13 +45,6 @@ matrix:
         - wget https://swift.org/builds/development/ubuntu1404/$SWIFT_VERSION/$SWIFT_VERSION-ubuntu14.04.tar.gz
         - tar xzf $SWIFT_VERSION-ubuntu14.04.tar.gz
         - export PATH="${PWD}/${SWIFT_VERSION}-ubuntu14.04/usr/bin:${PATH}"
-        # install latest package manager with `swift-test`
-        # - git clone https://github.com/apple/swift-package-manager
-        # - cd swift-package-manager
-        # - Utilities/bootstrap
-        # - export SWIFT_BUILD_PATH=`pwd`
-        # - export PATH=$SWIFT_BUILD_PATH/.build/debug:$PATH
-        # - cd ..
         # get back home
         - cd $MODULE_NAME
         # get crossroad build script
