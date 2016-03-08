@@ -108,11 +108,11 @@
 
     // This class is workaround around retain cycle in pthread run loop creation. See below in init(). Stupid ARC :(
     private class RunLoopHolder {
-        var loop: RunLoop? = nil
+        var loop: CoreFoundationRunLoop? = nil
     }
     
     private class SerialContext : ExecutionContextBase, ExecutionContextType {
-        private let rl:RunLoop
+        private let rl:CoreFoundationRunLoop
         
         override init() {
             let holder = RunLoopHolder()
@@ -123,10 +123,10 @@
             }
             
             PThread(task: { [unowned holder] in
-                holder.loop = RunLoop.currentRunLoop()
+                holder.loop = CoreFoundationRunLoop.currentRunLoop()
                 holder.loop!.startTaskQueue()
                 sema.signal()
-                RunLoop.run()
+                CoreFoundationRunLoop.run()
             }).start()
             
             sema.wait()
@@ -134,7 +134,7 @@
             self.rl = holder.loop!
         }
         
-        init(runLoop:RunLoop) {
+        init(runLoop:CoreFoundationRunLoop) {
             rl = runLoop
             rl.startTaskQueue()
         }
@@ -148,7 +148,7 @@
         }
         
         func async(after:Double, task:SafeTask) {
-            rl.addDelay(RunLoopDelay(task, delay: after), mode: RunLoop.defaultMode)
+            rl.addDelay(RunLoopDelay(task, delay: after), mode: CoreFoundationRunLoop.defaultMode)
         }
         
         func sync<ReturnType>(task:() throws -> ReturnType) throws -> ReturnType {
@@ -186,7 +186,7 @@
             inner.async(after, task: task)
         }
         
-        public static let main:ExecutionContextType = PThreadExecutionContext(inner: SerialContext(runLoop: RunLoop.mainRunLoop()))
+        public static let main:ExecutionContextType = PThreadExecutionContext(inner: SerialContext(runLoop: CoreFoundationRunLoop.mainRunLoop()))
         public static let global:ExecutionContextType = PThreadExecutionContext(kind: .Parallel)
     }
 

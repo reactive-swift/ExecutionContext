@@ -110,7 +110,7 @@ public class CFRunLoopSemaphore : SemaphoreType {
         
         while value <= 0 {
             while !self.signaled && !timedout {
-                RunLoop.runUntilOnce(RunLoop.defaultMode, until: until)
+                CoreFoundationRunLoop.runUntilOnce(CoreFoundationRunLoop.defaultMode, until: until)
                 timedout = until.timeIntervalSinceNow <= 0
             }
             if timedout {
@@ -132,18 +132,122 @@ public class CFRunLoopSemaphore : SemaphoreType {
     }
     
     public func willUse() {
-        let loop:RunLoop = RunLoop.currentRunLoop()
-        loop.addSource(source!, mode: RunLoop.defaultMode)
+        let loop:CoreFoundationRunLoop = CoreFoundationRunLoop.currentRunLoop()
+        loop.addSource(source!, mode: CoreFoundationRunLoop.defaultMode)
     }
     
     public func didUse() {
-        let loop:RunLoop = RunLoop.currentRunLoop()
-        loop.removeSource(source!, mode: RunLoop.defaultMode)
+        let loop:CoreFoundationRunLoop = CoreFoundationRunLoop.currentRunLoop()
+        loop.removeSource(source!, mode: CoreFoundationRunLoop.defaultMode)
+    }
+}
+
+import RunLoop
+import Boilerplate
+
+extension RunnableRunLoopType {
+    func runWithConditionalDate(until:NSDate?) -> Bool {
+        if let until = until {
+            return self.run(Timeout(until: until))
+        } else {
+            return self.run()
+        }
+    }
+}
+
+class HashableAnyContainer<T> : AnyContainer<T>, Hashable {
+    let hashValue: Int = random()
+    
+    override init(_ item: T) {
+        super.init(item)
+    }
+}
+
+func ==<T>(lhs:HashableAnyContainer<T>, rhs:HashableAnyContainer<T>) -> Bool {
+    return lhs.hashValue == rhs.hashValue
+}
+
+public class RunLoopSemaphore : SemaphoreType {
+    private var signals:[HashableAnyContainer<SafeTask>]
+    private let lock:NSLock
+    private var value:Int
+    
+    public required convenience init() {
+        self.init(value: 0)
+    }
+    
+    public required init(value: Int) {
+        self.value = value
+        signals = Array()
+        lock = NSLock()
+    }
+    
+    public func wait() -> Bool {
+        return wait(nil)
+    }
+    
+    public func wait(until:NSDate?) -> Bool {
+        lock.lock()
+        value -= 1
+        defer {
+            lock.unlock()
+        }
+        
+        if value >= 0 {
+            value += 1
+            return true
+        }
+        
+        var signaled = false
+        var timedout = false
+        
+        let rl = RunLoop.current as! RunnableRunLoopType
+        
+        let signal = HashableAnyContainer {
+            rl.execute {
+                signaled = true
+                rl.stop()
+            }
+        }
+        
+        signals.append(signal)
+        
+        while value < 0 {
+            lock.unlock()
+            defer {
+                lock.lock()
+            }
+            while !signaled && !timedout {
+                timedout = rl.runWithConditionalDate(until)
+            }
+            
+            if timedout {
+                break
+            }
+        }
+        
+        let index = signals.indexOf { element in
+            element == signal
+        }
+        if let index = index {
+            signals.removeAtIndex(index)
+        }
+        
+        return signaled
+    }
+    
+    public func signal() -> Int {
+        lock.lock()
+        value += 1
+        let signal:AnyContainer<SafeTask>? = signals.isEmpty ? nil : signals.removeFirst()
+        lock.unlock()
+        signal?.content()
+        return 1
     }
 }
 
 #if !os(Linux) || dispatch
-    public typealias LoopSemaphore = DispatchLoopSemaphore
+    public typealias LoopSemaphore = RunLoopSemaphore
 #else
     public typealias LoopSemaphore = CFRunLoopSemaphore
 #endif

@@ -74,7 +74,7 @@ private class TaskQueue {
 private class RunLoopCallbackInfo {
     private let lock = NSLock()
     private let task: SafeTask
-    private var runLoops: [RunLoop] = []
+    private var runLoops: [CoreFoundationRunLoop] = []
     
     init(_ task: SafeTask) {
         self.task = task
@@ -84,7 +84,7 @@ private class RunLoopCallbackInfo {
         task()
     }
     
-    func addRunLoop(rl: RunLoop) {
+    func addRunLoop(rl: CoreFoundationRunLoop) {
         defer {
             lock.unlock()
         }
@@ -92,7 +92,7 @@ private class RunLoopCallbackInfo {
         runLoops.append(rl)
     }
     
-    func removeRunLoop(rl: RunLoop) {
+    func removeRunLoop(rl: CoreFoundationRunLoop) {
         defer {
             lock.unlock()
         }
@@ -238,10 +238,10 @@ class RunLoopDelay : RunLoopCallback {
 }
 
 private func runLoopTLRelease(rl : UnsafeMutablePointer<Void>) {
-    Unmanaged<RunLoop>.fromOpaque(COpaquePointer(rl)).release()
+    Unmanaged<CoreFoundationRunLoop>.fromOpaque(COpaquePointer(rl)).release()
 }
 
-class RunLoop {
+class CoreFoundationRunLoop {
     private let cfRunLoop: CFRunLoop!
     
     private var taskQueueSource: RunLoopTaskQueueSource? = nil
@@ -256,7 +256,7 @@ class RunLoop {
     private static let threadKey = PThreadKey(destructionCallback: runLoopTLRelease)
     
     private static let threadLocalLock = NSLock()
-    private static let MainRunLoop = RunLoop.createMainRunLoop()
+    private static let MainRunLoop = CoreFoundationRunLoop.createMainRunLoop()
     
     init(_ cfRunLoop: CFRunLoop) {
         self.cfRunLoop = cfRunLoop
@@ -266,15 +266,15 @@ class RunLoop {
         self.init(unsafeBitCast(runLoop, CFRunLoop.self))
     }
     
-    private static func createMainRunLoop() -> RunLoop {
+    private static func createMainRunLoop() -> CoreFoundationRunLoop {
         defer {
-            RunLoop.threadLocalLock.unlock()
+            CoreFoundationRunLoop.threadLocalLock.unlock()
         }
         
-        RunLoop.threadLocalLock.lock()
-        let runLoop = RunLoop(CFRunLoopGetMain())
+        CoreFoundationRunLoop.threadLocalLock.lock()
+        let runLoop = CoreFoundationRunLoop(CFRunLoopGetMain())
         if runLoop.isCurrent() {
-            PThread.setSpecific(runLoop, key: RunLoop.threadKey, retain: true)
+            PThread.setSpecific(runLoop, key: CoreFoundationRunLoop.threadKey, retain: true)
         } else {
             let sema = Semaphore()
             sema.willUse()
@@ -282,7 +282,7 @@ class RunLoop {
                 sema.didUse()
             }
             runLoop.addTask({
-                PThread.setSpecific(runLoop, key: RunLoop.threadKey, retain: true)
+                PThread.setSpecific(runLoop, key: CoreFoundationRunLoop.threadKey, retain: true)
                 sema.signal()
             })
             sema.wait()
@@ -290,20 +290,20 @@ class RunLoop {
         return runLoop
     }
     
-    static func currentRunLoop() -> RunLoop {
+    static func currentRunLoop() -> CoreFoundationRunLoop {
         defer {
-            RunLoop.threadLocalLock.unlock()
+            CoreFoundationRunLoop.threadLocalLock.unlock()
         }
-        RunLoop.threadLocalLock.lock()
-        guard let loop = PThread.getSpecific(RunLoop.threadKey) else {
-            let loop = RunLoop(CFRunLoopGetCurrent())
-            PThread.setSpecific(loop, key: RunLoop.threadKey, retain: true)
+        CoreFoundationRunLoop.threadLocalLock.lock()
+        guard let loop = PThread.getSpecific(CoreFoundationRunLoop.threadKey) else {
+            let loop = CoreFoundationRunLoop(CFRunLoopGetCurrent())
+            PThread.setSpecific(loop, key: CoreFoundationRunLoop.threadKey, retain: true)
             return loop
         }
-        return unsafeBitCast(loop, RunLoop.self)
+        return unsafeBitCast(loop, CoreFoundationRunLoop.self)
     }
     
-    static func mainRunLoop() -> RunLoop {
+    static func mainRunLoop() -> CoreFoundationRunLoop {
         return MainRunLoop
     }
     
@@ -314,7 +314,7 @@ class RunLoop {
         taskQueueLock.lock()
         self.taskQueueSource = RunLoopTaskQueueSource()
         
-        addSource(taskQueueSource!, mode: RunLoop.defaultMode)
+        addSource(taskQueueSource!, mode: CoreFoundationRunLoop.defaultMode)
     }
     
     func stopTaskQueue() {
@@ -331,15 +331,15 @@ class RunLoop {
     }
     
     static func run() {
-        runInMode(RunLoop.defaultMode)
+        runInMode(CoreFoundationRunLoop.defaultMode)
     }
     
     static func runUntil(mode: NSString, until:NSDate) {
-        RunLoop.runWithTimeout(mode, timeout: until.timeIntervalSinceNow)
+        CoreFoundationRunLoop.runWithTimeout(mode, timeout: until.timeIntervalSinceNow)
     }
     
     static func runUntilOnce(mode: NSString, until:NSDate) {
-        RunLoop.runWithOptions(mode, timeout: until.timeIntervalSinceNow, once: true)
+        CoreFoundationRunLoop.runWithOptions(mode, timeout: until.timeIntervalSinceNow, once: true)
     }
     
     static func runWithOptions(mode: NSString, timeout:NSTimeInterval, once:Bool) {
@@ -356,11 +356,11 @@ class RunLoop {
     }
     
     static func runWithTimeout(mode: NSString, timeout:NSTimeInterval) {
-        RunLoop.runWithOptions(mode, timeout: timeout, once: false)
+        CoreFoundationRunLoop.runWithOptions(mode, timeout: timeout, once: false)
     }
     
     static func runInMode(mode: NSString) {
-        RunLoop.runWithTimeout(mode, timeout: Double.infinity)
+        CoreFoundationRunLoop.runWithTimeout(mode, timeout: Double.infinity)
     }
     
     @noreturn static func runForever() {
@@ -403,7 +403,7 @@ class RunLoop {
             queue.addTask(task)
         } else {
             let source = RunLoopSource(task, priority: 0, runOnce: true)
-            addSource(source, mode: RunLoop.defaultMode)
+            addSource(source, mode: CoreFoundationRunLoop.defaultMode)
             source.signal()
         }
     }
@@ -413,9 +413,9 @@ class RunLoop {
     }
 }
 
-extension RunLoop : Equatable {
+extension CoreFoundationRunLoop : Equatable {
 }
 
-func ==(lhs: RunLoop, rhs: RunLoop) -> Bool {
+func ==(lhs: CoreFoundationRunLoop, rhs: CoreFoundationRunLoop) -> Bool {
     return lhs.cfRunLoop === rhs.cfRunLoop
 }

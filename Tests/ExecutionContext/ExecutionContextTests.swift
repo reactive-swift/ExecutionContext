@@ -99,14 +99,14 @@ class ExecutionContextTests: XCTestCase {
         afterTestAdvanced(context)
     }
     
-    func testMain() {
+/*    func testMain() {
         let context:ExecutionContextType = DefaultExecutionContext.main
         
         syncTest(context)
         asyncTest(context)
         afterTest(context)
         //afterTestAdvanced - no it will not work here
-    }
+    }*/
     
     func testCustomOnGlobal() {
         let context = executionContext(global.execute)
@@ -117,14 +117,14 @@ class ExecutionContextTests: XCTestCase {
         afterTestAdvanced(context)
     }
     
-    func testCustomOnMain() {
+/*    func testCustomOnMain() {
         let context = executionContext(main.execute)
         
         syncTest(context)
         asyncTest(context)
         afterTest(context)
         //afterTestAdvanced - no it will not work here
-    }
+    }*/
     
     func testCustomSimple() {
         let context = executionContext { task in

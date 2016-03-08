@@ -18,7 +18,7 @@ import Foundation
 
 #if !os(Linux) || dispatch
     
-    public typealias DefaultExecutionContext = DispatchExecutionContext
+    public typealias DefaultExecutionContext = RunLoopExecutionContext
     
 #else
     

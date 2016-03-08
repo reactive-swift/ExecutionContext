@@ -20,6 +20,10 @@
 		65246B591C8E1F9B00421D73 /* RunLoop.framework in Copy Frameworks */ = {isa = PBXBuildFile; fileRef = 65246B4B1C8E1F6B00421D73 /* RunLoop.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		65246B5A1C8E1F9B00421D73 /* UV.framework in Copy Frameworks */ = {isa = PBXBuildFile; fileRef = 65246B4C1C8E1F6B00421D73 /* UV.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		65246B5B1C8E1F9B00421D73 /* Result.framework in Copy Frameworks */ = {isa = PBXBuildFile; fileRef = 659E80E61C78A70700DE85B1 /* Result.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
+		653FF6DF1C8EF8D900A3BF90 /* RunLoopExecutionContext.swift in Sources */ = {isa = PBXBuildFile; fileRef = 653FF6DE1C8EF8D900A3BF90 /* RunLoopExecutionContext.swift */; };
+		653FF6E01C8EF8D900A3BF90 /* RunLoopExecutionContext.swift in Sources */ = {isa = PBXBuildFile; fileRef = 653FF6DE1C8EF8D900A3BF90 /* RunLoopExecutionContext.swift */; };
+		653FF6E11C8EF8D900A3BF90 /* RunLoopExecutionContext.swift in Sources */ = {isa = PBXBuildFile; fileRef = 653FF6DE1C8EF8D900A3BF90 /* RunLoopExecutionContext.swift */; };
+		653FF6E21C8EF8D900A3BF90 /* RunLoopExecutionContext.swift in Sources */ = {isa = PBXBuildFile; fileRef = 653FF6DE1C8EF8D900A3BF90 /* RunLoopExecutionContext.swift */; };
 		658566A31C7CAEE3003B0E08 /* LoopSemaphore.swift in Sources */ = {isa = PBXBuildFile; fileRef = 658566A21C7CAEE3003B0E08 /* LoopSemaphore.swift */; };
 		659E80891C77450200DE85B1 /* ExecutionContext.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 659E807E1C77450200DE85B1 /* ExecutionContext.framework */; };
 		659E808E1C77450200DE85B1 /* ExecutionContextTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 659E808D1C77450200DE85B1 /* ExecutionContextTests.swift */; };
@@ -143,6 +147,7 @@
 		65246B4A1C8E1F6B00421D73 /* Result.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; path = Result.framework; sourceTree = "<group>"; };
 		65246B4B1C8E1F6B00421D73 /* RunLoop.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; path = RunLoop.framework; sourceTree = "<group>"; };
 		65246B4C1C8E1F6B00421D73 /* UV.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; path = UV.framework; sourceTree = "<group>"; };
+		653FF6DE1C8EF8D900A3BF90 /* RunLoopExecutionContext.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = RunLoopExecutionContext.swift; sourceTree = "<group>"; };
 		658566A21C7CAEE3003B0E08 /* LoopSemaphore.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = LoopSemaphore.swift; sourceTree = "<group>"; };
 		659E807E1C77450200DE85B1 /* ExecutionContext.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = ExecutionContext.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		659E80831C77450200DE85B1 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
@@ -286,6 +291,7 @@
 				65E646F11C79E0580036D028 /* Semaphore.swift */,
 				659E80831C77450200DE85B1 /* Info.plist */,
 				658566A21C7CAEE3003B0E08 /* LoopSemaphore.swift */,
+				653FF6DE1C8EF8D900A3BF90 /* RunLoopExecutionContext.swift */,
 			);
 			path = ExecutionContext;
 			sourceTree = "<group>";
@@ -647,6 +653,7 @@
 				659E809E1C77457E00DE85B1 /* DefaultExecutionContext.swift in Sources */,
 				65E646F21C79E0590036D028 /* Semaphore.swift in Sources */,
 				658566A31C7CAEE3003B0E08 /* LoopSemaphore.swift in Sources */,
+				653FF6DF1C8EF8D900A3BF90 /* RunLoopExecutionContext.swift in Sources */,
 				659E80A21C77457E00DE85B1 /* PThreadExecutionContext.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -672,6 +679,7 @@
 				659E80DB1C78A4B800DE85B1 /* ImmediateExecutionContext.swift in Sources */,
 				659E80D71C78A4AB00DE85B1 /* ExecutionContext.swift in Sources */,
 				65E646F31C79E0590036D028 /* Semaphore.swift in Sources */,
+				653FF6E01C8EF8D900A3BF90 /* RunLoopExecutionContext.swift in Sources */,
 				659E80D91C78A4B200DE85B1 /* DispatchExecutionContext.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -697,6 +705,7 @@
 				65FB86B31C78AAE50005CD1B /* ImmediateExecutionContext.swift in Sources */,
 				65FB86AF1C78AADB0005CD1B /* ExecutionContext.swift in Sources */,
 				65E646F41C79E0590036D028 /* Semaphore.swift in Sources */,
+				653FF6E11C8EF8D900A3BF90 /* RunLoopExecutionContext.swift in Sources */,
 				65FB86B11C78AAE50005CD1B /* DispatchExecutionContext.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -722,6 +731,7 @@
 				65FB86CA1C78AC8B0005CD1B /* ImmediateExecutionContext.swift in Sources */,
 				65FB86C61C78AC8B0005CD1B /* ExecutionContext.swift in Sources */,
 				65E646F51C79E0590036D028 /* Semaphore.swift in Sources */,
+				653FF6E21C8EF8D900A3BF90 /* RunLoopExecutionContext.swift in Sources */,
 				65FB86C81C78AC8B0005CD1B /* DispatchExecutionContext.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -850,12 +860,15 @@
 					"$(PROJECT_DIR)/Carthage/Build/watchOS",
 				);
 				FRAMEWORK_VERSION = A;
+				HEADER_SEARCH_PATHS = /usr/local/include;
 				INFOPLIST_FILE = ExecutionContext/Info.plist;
 				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Frameworks";
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/../Frameworks @loader_path/Frameworks";
+				LIBRARY_SEARCH_PATHS = /usr/local/lib;
 				PRODUCT_BUNDLE_IDENTIFIER = xyz.crossroadlabs.ExecutionContext;
 				PRODUCT_NAME = "$(PROJECT_NAME)";
 				SKIP_INSTALL = YES;
+				SWIFT_INCLUDE_PATHS = "$(PROJECT_DIR)/Carthage/Checkouts";
 				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
 			};
 			name = Debug;
@@ -877,12 +890,15 @@
 					"$(PROJECT_DIR)/Carthage/Build/watchOS",
 				);
 				FRAMEWORK_VERSION = A;
+				HEADER_SEARCH_PATHS = /usr/local/include;
 				INFOPLIST_FILE = ExecutionContext/Info.plist;
 				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Frameworks";
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/../Frameworks @loader_path/Frameworks";
+				LIBRARY_SEARCH_PATHS = /usr/local/lib;
 				PRODUCT_BUNDLE_IDENTIFIER = xyz.crossroadlabs.ExecutionContext;
 				PRODUCT_NAME = "$(PROJECT_NAME)";
 				SKIP_INSTALL = YES;
+				SWIFT_INCLUDE_PATHS = "$(PROJECT_DIR)/Carthage/Checkouts";
 			};
 			name = Release;
 		};
@@ -896,6 +912,7 @@
 				);
 				INFOPLIST_FILE = Tests/ExecutionContext/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/../Frameworks @loader_path/../Frameworks";
+				LIBRARY_SEARCH_PATHS = /usr/local/lib;
 				PRODUCT_BUNDLE_IDENTIFIER = xyz.crossroadlabs.ExecutionContextTests;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 			};
@@ -911,6 +928,7 @@
 				);
 				INFOPLIST_FILE = Tests/ExecutionContext/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/../Frameworks @loader_path/../Frameworks";
+				LIBRARY_SEARCH_PATHS = /usr/local/lib;
 				PRODUCT_BUNDLE_IDENTIFIER = xyz.crossroadlabs.ExecutionContextTests;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 			};
