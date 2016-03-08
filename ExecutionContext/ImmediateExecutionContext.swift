@@ -15,6 +15,7 @@
 //===----------------------------------------------------------------------===//
 
 import Foundation
+import Boilerplate
 
 public class ImmediateExecutionContext : ExecutionContextBase, ExecutionContextType {
     public func async(task:SafeTask) {

@@ -7,6 +7,19 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		65246B4D1C8E1F6B00421D73 /* Boilerplate.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 65246B491C8E1F6B00421D73 /* Boilerplate.framework */; };
+		65246B4E1C8E1F6B00421D73 /* Result.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 65246B4A1C8E1F6B00421D73 /* Result.framework */; };
+		65246B4F1C8E1F6B00421D73 /* RunLoop.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 65246B4B1C8E1F6B00421D73 /* RunLoop.framework */; };
+		65246B501C8E1F6B00421D73 /* UV.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 65246B4C1C8E1F6B00421D73 /* UV.framework */; };
+		65246B511C8E1F8500421D73 /* Boilerplate.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 65246B491C8E1F6B00421D73 /* Boilerplate.framework */; };
+		65246B531C8E1F8500421D73 /* RunLoop.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 65246B4B1C8E1F6B00421D73 /* RunLoop.framework */; };
+		65246B541C8E1F8500421D73 /* UV.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 65246B4C1C8E1F6B00421D73 /* UV.framework */; };
+		65246B561C8E1F9000421D73 /* Result.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 65246B4A1C8E1F6B00421D73 /* Result.framework */; };
+		65246B571C8E1F9B00421D73 /* Boilerplate.framework in Copy Frameworks */ = {isa = PBXBuildFile; fileRef = 65246B491C8E1F6B00421D73 /* Boilerplate.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
+		65246B581C8E1F9B00421D73 /* Result.framework in Copy Frameworks */ = {isa = PBXBuildFile; fileRef = 65246B4A1C8E1F6B00421D73 /* Result.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
+		65246B591C8E1F9B00421D73 /* RunLoop.framework in Copy Frameworks */ = {isa = PBXBuildFile; fileRef = 65246B4B1C8E1F6B00421D73 /* RunLoop.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
+		65246B5A1C8E1F9B00421D73 /* UV.framework in Copy Frameworks */ = {isa = PBXBuildFile; fileRef = 65246B4C1C8E1F6B00421D73 /* UV.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
+		65246B5B1C8E1F9B00421D73 /* Result.framework in Copy Frameworks */ = {isa = PBXBuildFile; fileRef = 659E80E61C78A70700DE85B1 /* Result.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		658566A31C7CAEE3003B0E08 /* LoopSemaphore.swift in Sources */ = {isa = PBXBuildFile; fileRef = 658566A21C7CAEE3003B0E08 /* LoopSemaphore.swift */; };
 		659E80891C77450200DE85B1 /* ExecutionContext.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 659E807E1C77450200DE85B1 /* ExecutionContext.framework */; };
 		659E808E1C77450200DE85B1 /* ExecutionContextTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 659E808D1C77450200DE85B1 /* ExecutionContextTests.swift */; };
@@ -34,7 +47,6 @@
 		65E646F31C79E0590036D028 /* Semaphore.swift in Sources */ = {isa = PBXBuildFile; fileRef = 65E646F11C79E0580036D028 /* Semaphore.swift */; };
 		65E646F41C79E0590036D028 /* Semaphore.swift in Sources */ = {isa = PBXBuildFile; fileRef = 65E646F11C79E0580036D028 /* Semaphore.swift */; };
 		65E646F51C79E0590036D028 /* Semaphore.swift in Sources */ = {isa = PBXBuildFile; fileRef = 65E646F11C79E0580036D028 /* Semaphore.swift */; };
-		65FB86901C78A8330005CD1B /* Result.framework in Copy Frameworks */ = {isa = PBXBuildFile; fileRef = 659E80E61C78A70700DE85B1 /* Result.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		65FB86921C78A8D30005CD1B /* Result.framework in Copy Frameworks */ = {isa = PBXBuildFile; fileRef = 659E80E31C78A70700DE85B1 /* Result.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		65FB86A21C78AA400005CD1B /* ExecutionContext.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 65FB86981C78AA400005CD1B /* ExecutionContext.framework */; };
 		65FB86AF1C78AADB0005CD1B /* ExecutionContext.swift in Sources */ = {isa = PBXBuildFile; fileRef = 659E809A1C77457E00DE85B1 /* ExecutionContext.swift */; };
@@ -93,7 +105,11 @@
 			dstPath = "";
 			dstSubfolderSpec = 10;
 			files = (
-				65FB86901C78A8330005CD1B /* Result.framework in Copy Frameworks */,
+				65246B571C8E1F9B00421D73 /* Boilerplate.framework in Copy Frameworks */,
+				65246B581C8E1F9B00421D73 /* Result.framework in Copy Frameworks */,
+				65246B591C8E1F9B00421D73 /* RunLoop.framework in Copy Frameworks */,
+				65246B5A1C8E1F9B00421D73 /* UV.framework in Copy Frameworks */,
+				65246B5B1C8E1F9B00421D73 /* Result.framework in Copy Frameworks */,
 			);
 			name = "Copy Frameworks";
 			runOnlyForDeploymentPostprocessing = 0;
@@ -123,6 +139,10 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
+		65246B491C8E1F6B00421D73 /* Boilerplate.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; path = Boilerplate.framework; sourceTree = "<group>"; };
+		65246B4A1C8E1F6B00421D73 /* Result.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; path = Result.framework; sourceTree = "<group>"; };
+		65246B4B1C8E1F6B00421D73 /* RunLoop.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; path = RunLoop.framework; sourceTree = "<group>"; };
+		65246B4C1C8E1F6B00421D73 /* UV.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; path = UV.framework; sourceTree = "<group>"; };
 		658566A21C7CAEE3003B0E08 /* LoopSemaphore.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = LoopSemaphore.swift; sourceTree = "<group>"; };
 		659E807E1C77450200DE85B1 /* ExecutionContext.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = ExecutionContext.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		659E80831C77450200DE85B1 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
@@ -144,7 +164,6 @@
 		659E80E31C78A70700DE85B1 /* Result.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; path = Result.framework; sourceTree = "<group>"; };
 		659E80E41C78A70700DE85B1 /* Result.framework.dSYM */ = {isa = PBXFileReference; lastKnownFileType = wrapper.dsym; path = Result.framework.dSYM; sourceTree = "<group>"; };
 		659E80E61C78A70700DE85B1 /* Result.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; path = Result.framework; sourceTree = "<group>"; };
-		659E80E71C78A70700DE85B1 /* Result.framework.dSYM */ = {isa = PBXFileReference; lastKnownFileType = wrapper.dsym; path = Result.framework.dSYM; sourceTree = "<group>"; };
 		659E80E91C78A70700DE85B1 /* B664D9B2-6E95-32DB-AE17-189723115AE7.bcsymbolmap */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = "B664D9B2-6E95-32DB-AE17-189723115AE7.bcsymbolmap"; sourceTree = "<group>"; };
 		659E80EA1C78A70700DE85B1 /* EFEDA4F1-6B1F-3501-98EF-3133DB0026EA.bcsymbolmap */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = "EFEDA4F1-6B1F-3501-98EF-3133DB0026EA.bcsymbolmap"; sourceTree = "<group>"; };
 		659E80EB1C78A70700DE85B1 /* Result.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; path = Result.framework; sourceTree = "<group>"; };
@@ -166,7 +185,11 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				65246B4F1C8E1F6B00421D73 /* RunLoop.framework in Frameworks */,
+				65246B4E1C8E1F6B00421D73 /* Result.framework in Frameworks */,
+				65246B4D1C8E1F6B00421D73 /* Boilerplate.framework in Frameworks */,
 				659E81131C78A72C00DE85B1 /* Result.framework in Frameworks */,
+				65246B501C8E1F6B00421D73 /* UV.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -175,6 +198,10 @@
 			buildActionMask = 2147483647;
 			files = (
 				659E80891C77450200DE85B1 /* ExecutionContext.framework in Frameworks */,
+				65246B511C8E1F8500421D73 /* Boilerplate.framework in Frameworks */,
+				65246B531C8E1F8500421D73 /* RunLoop.framework in Frameworks */,
+				65246B561C8E1F9000421D73 /* Result.framework in Frameworks */,
+				65246B541C8E1F8500421D73 /* UV.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -301,8 +328,11 @@
 		659E80E51C78A70700DE85B1 /* Mac */ = {
 			isa = PBXGroup;
 			children = (
+				65246B491C8E1F6B00421D73 /* Boilerplate.framework */,
+				65246B4A1C8E1F6B00421D73 /* Result.framework */,
+				65246B4B1C8E1F6B00421D73 /* RunLoop.framework */,
+				65246B4C1C8E1F6B00421D73 /* UV.framework */,
 				659E80E61C78A70700DE85B1 /* Result.framework */,
-				659E80E71C78A70700DE85B1 /* Result.framework.dSYM */,
 			);
 			name = Mac;
 			path = Carthage/Build/Mac;

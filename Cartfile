@@ -1,1 +1,2 @@
 github "crossroadlabs/Result" ~> 1.0
+github "crossroadlabs/RunLoop" "master"

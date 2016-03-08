@@ -16,6 +16,7 @@
 
 import Foundation
 import CoreFoundation
+import Boilerplate
 
 private extension NSString {
     var cfString: CFString { return unsafeBitCast(self, CFString.self) }

@@ -16,6 +16,7 @@
 
 import Foundation
 import Result
+import Boilerplate
 
 #if os(Linux)
     import Glibc
@@ -24,9 +25,6 @@ import Result
 #if !os(Linux) || dispatch
     import Dispatch
 #endif
-
-public typealias Task = () throws -> Void
-public typealias SafeTask = () -> Void
 
 // return true if error successfully handled, false otherwise
 public typealias ErrorHandler = (e:ErrorType) throws -> Bool
