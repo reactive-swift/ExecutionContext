@@ -35,7 +35,7 @@ public class CustomExecutionContext : ExecutionContextBase, ExecutionContextType
         }
     }
     
-    public func sync<ReturnType>(task:() throws -> ReturnType) throws -> ReturnType {
+    public func sync<ReturnType>(task:() throws -> ReturnType) rethrows -> ReturnType {
         return try syncThroughAsync(task)
     }
 }

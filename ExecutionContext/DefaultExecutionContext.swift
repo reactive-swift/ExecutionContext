@@ -16,13 +16,13 @@
 
 import Foundation
 
-#if !os(Linux) || dispatch
+#if dispatch
     
     public typealias DefaultExecutionContext = RunLoopExecutionContext
     
 #else
     
-    public typealias DefaultExecutionContext = PThreadExecutionContext
+    public typealias DefaultExecutionContext = RunLoopExecutionContext
     
 #endif
 

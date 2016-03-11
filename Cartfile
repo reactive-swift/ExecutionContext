@@ -1,2 +1,2 @@
 github "crossroadlabs/Result" ~> 1.0
-github "crossroadlabs/RunLoop" "master"
+github "crossroadlabs/RunLoop" "feature-relay-2"

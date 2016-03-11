@@ -19,36 +19,16 @@ import Result
 import Boilerplate
 import RunLoop
 
-private func thread_proc(arg: UnsafeMutablePointer<Void>) -> UnsafeMutablePointer<Void> {
-    let task = Unmanaged<AnyContainer<SafeTask>>.fromOpaque(COpaquePointer(arg)).takeRetainedValue()
-    task.content()
-    return nil
-}
-
-private func detach_pthread(task:SafeTask) throws {
-    var thread:pthread_t = pthread_t()
-    let unmanaged = Unmanaged.passRetained(AnyContainer(task))
-    let arg = UnsafeMutablePointer<Void>(unmanaged.toOpaque())
-    do {
-        try ccall(CError.self) {
-            pthread_create(&thread, nil, thread_proc, arg)
-        }
-    } catch {
-        unmanaged.release()
-        throw error
-    }
-}
-
 private class ParallelContext : ExecutionContextBase, ExecutionContextType {
     func runAsync(task:SafeTask) {
         do {
-            try detach_pthread {
-/*                if (!RunLoop.trySetFactory {
+            try Thread.detach {
+                if (!RunLoop.trySetFactory {
                     return RunLoop()
                 }) {
                     print("unable to set run loop")
                     exit(1)
-                }*/
+                }
                 
                 guard let loop = RunLoop.current as? RunnableRunLoopType else {
                     print("unable to run run loop")
@@ -81,56 +61,56 @@ private class ParallelContext : ExecutionContextBase, ExecutionContextType {
         }
     }
     
-    func sync<ReturnType>(task:() throws -> ReturnType) throws -> ReturnType {
+    func sync<ReturnType>(task:() throws -> ReturnType) rethrows -> ReturnType {
         return try syncThroughAsync(task)
     }
 }
 
 private class SerialContext : ExecutionContextBase, ExecutionContextType {
-    private let rl:RunnableRunLoopType
+    private let loop:RunnableRunLoopType
     
     override init() {
-        let sema = Semaphore()
+        let sema = BlockingSemaphore()
         let loop = MutableAnyContainer<RunnableRunLoopType?>(nil)
         
         //yeah, fail for now
-        try! detach_pthread {
-            loop.content = (RunLoop.current as! RunnableRunLoopType)
+        try! Thread.detach {
+            var _loop = (RunLoop.current as! RunnableRunLoopType)
+            loop.content = _loop
+            
             sema.signal()
             
-            (RunLoop.current as! RunnableRunLoopType).run()
+            _loop.protected = true
+            _loop.run()
         }
         
         sema.wait()
         
-        self.rl = loop.content!
+        self.loop = loop.content!
     }
     
     init(runLoop:RunLoopType) {
-        rl = runLoop as! RunnableRunLoopType
+        loop = runLoop as! RunnableRunLoopType
     }
     
     deinit {
-        let rl = self.rl
+        var rl = self.loop
         rl.execute {
+            rl.protected = false
             rl.stop()
         }
     }
     
     func async(task:SafeTask) {
-        rl.execute(task)
+        loop.execute(task)
     }
     
     func async(after:Double, task:SafeTask) {
-        rl.execute(Timeout(timeout: after), task: task)
+        loop.execute(Timeout(timeout: after), task: task)
     }
     
-    func sync<ReturnType>(task:() throws -> ReturnType) throws -> ReturnType {
-        if rl.isEqualTo(RunLoop.current) {
-            return try task()
-        } else {
-            return try syncThroughAsync(task)
-        }
+    func sync<ReturnType>(task:() throws -> ReturnType) rethrows -> ReturnType {
+        return try loop.sync(task)
     }
 }
 
@@ -152,7 +132,7 @@ public class RunLoopExecutionContext : ExecutionContextBase, ExecutionContextTyp
         inner.async(task)
     }
     
-    public func sync<ReturnType>(task:() throws -> ReturnType) throws -> ReturnType {
+    public func sync<ReturnType>(task:() throws -> ReturnType) rethrows -> ReturnType {
         return try inner.sync(task)
     }
     
@@ -160,6 +140,6 @@ public class RunLoopExecutionContext : ExecutionContextBase, ExecutionContextTyp
         inner.async(after, task: task)
     }
     
-    public static let main:ExecutionContextType = PThreadExecutionContext(inner: SerialContext(runLoop: RunLoop.main))
-    public static let global:ExecutionContextType = PThreadExecutionContext(kind: .Parallel)
+    public static let main:ExecutionContextType = RunLoopExecutionContext(inner: SerialContext(runLoop: RunLoop.main))
+    public static let global:ExecutionContextType = RunLoopExecutionContext(kind: .Parallel)
 }

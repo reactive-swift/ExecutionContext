@@ -29,7 +29,7 @@ public class ImmediateExecutionContext : ExecutionContextBase, ExecutionContextT
         }
     }
     
-    public func sync<ReturnType>(task:() throws -> ReturnType) throws -> ReturnType {
+    public func sync<ReturnType>(task:() throws -> ReturnType) rethrows -> ReturnType {
         return try task()
     }
 }

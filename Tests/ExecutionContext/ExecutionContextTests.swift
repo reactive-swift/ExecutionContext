@@ -21,6 +21,9 @@ import XCTest
     import Glibc
 #endif
 
+import RunLoop
+import UV
+
 class ExecutionContextTests: XCTestCase {
     //Tests does not create static variables. We need initialized main thread
     //let mainContext = DefaultExecutionContext.main
@@ -99,16 +102,16 @@ class ExecutionContextTests: XCTestCase {
         afterTestAdvanced(context)
     }
     
-/*    func testMain() {
+    func testMain() {
         let context:ExecutionContextType = DefaultExecutionContext.main
         
         syncTest(context)
         asyncTest(context)
         afterTest(context)
         //afterTestAdvanced - no it will not work here
-    }*/
+    }
     
-    func testCustomOnGlobal() {
+/*    func testCustomOnGlobal() {
         let context = executionContext(global.execute)
         
         syncTest(context)
@@ -117,7 +120,7 @@ class ExecutionContextTests: XCTestCase {
         afterTestAdvanced(context)
     }
     
-/*    func testCustomOnMain() {
+    func testCustomOnMain() {
         let context = executionContext(main.execute)
         
         syncTest(context)
@@ -135,25 +138,6 @@ class ExecutionContextTests: XCTestCase {
         asyncTest(context)
         afterTest(context)
         //afterTestAdvanced - no it will not work here
-    }
-    
-    func testSemaphore() {
-        let sema = Semaphore(value: 1)
-        var n = 0
-        for _ in [0...100] {
-            global.execute {
-                sema.willUse()
-                defer {
-                    sema.didUse()
-                }
-                sema.wait()
-                XCTAssert(n == 0, "Should always be zero")
-                n += 1
-                sleep(0.1)
-                n -= 1
-                sema.signal()
-            }
-        }
     }
 }
 

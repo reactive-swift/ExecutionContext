@@ -53,17 +53,19 @@
             }
         }
         
-        public func sync<ReturnType>(task:() throws -> ReturnType) throws -> ReturnType {
+        public func sync<ReturnType>(task:() throws -> ReturnType) rethrows -> ReturnType {
             if dispatch_queue_get_label(DISPATCH_CURRENT_QUEUE_LABEL) == dispatch_queue_get_label(queue) {
                 return try task()
             } else {
-                var result:Result<ReturnType, AnyError>?
-                
-                dispatch_sync(queue) {
-                    result = materialize(task)
-                }
-                
-                return try result!.dematerializeAnyError()
+                return try {
+                    var result:Result<ReturnType, AnyError>?
+                    
+                    dispatch_sync(queue) {
+                        result = materializeAny(task)
+                    }
+                    
+                    return try result!.dematerializeAny()
+                }()
             }
         }
         

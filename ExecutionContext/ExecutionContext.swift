@@ -49,8 +49,7 @@ public protocol TaskSchedulerType {
     func async(after:Double, task:Task)
     func async(after:Double, task:SafeTask)
     
-    func sync<ReturnType>(task:() throws -> ReturnType) throws -> ReturnType
-    func sync<ReturnType>(task:() -> ReturnType) -> ReturnType
+    func sync<ReturnType>(task:() throws -> ReturnType) rethrows -> ReturnType
 }
 
 public protocol ExecutionContextType : TaskSchedulerType, ErrorHandlerRegistryType {
@@ -60,6 +59,27 @@ public protocol ExecutionContextType : TaskSchedulerType, ErrorHandlerRegistryTy
 public extension ExecutionContextType {
     func execute(task:SafeTask) {
         async(task)
+    }
+}
+
+import RunLoop
+
+extension ExecutionContextType {
+    func syncThroughAsync<ReturnType>(task:() throws -> ReturnType) rethrows -> ReturnType {
+        return try {
+            var result:Result<ReturnType, AnyError>?
+            
+            let sema = RunLoop.current.semaphore()
+            
+            async {
+                result = materializeAny(task)
+                sema.signal()
+            }
+            
+            sema.wait()
+            
+            return try result!.dematerializeAny()
+        }()
     }
 }
 
@@ -116,41 +136,12 @@ public extension ErrorHandlerRegistryType where Self : TaskSchedulerType {
     }
 }
 
-public extension TaskSchedulerType {
-    public func sync<ReturnType>(task:() -> ReturnType) -> ReturnType {
-        return try! sync { () throws -> ReturnType in
-            return task()
-        }
-    }
-}
-
 public enum ExecutionContextKind {
     case Serial
     case Parallel
 }
 
 public typealias ExecutionContext = DefaultExecutionContext
-
-extension ExecutionContextType {
-    func syncThroughAsync<ReturnType>(task:() throws -> ReturnType) throws -> ReturnType {
-        var result:Result<ReturnType, AnyError>?
-        
-        let sema = LoopSemaphore()
-        sema.willUse()
-        defer {
-            sema.didUse()
-        }
-        
-        async {
-            result = materialize(task)
-            sema.signal()
-        }
-        
-        sema.wait()
-        
-        return try result!.dematerializeAnyError()
-    }
-}
 
 public let immediate:ExecutionContextType = ImmediateExecutionContext()
 public let main:ExecutionContextType = ExecutionContext.main
