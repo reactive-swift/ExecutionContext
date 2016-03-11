@@ -45,20 +45,27 @@ public protocol TaskSchedulerType {
     func async(task:Task)
     func async(task:SafeTask)
     
-    //after is in seconds
-    func async(after:Double, task:Task)
-    func async(after:Double, task:SafeTask)
+    func async(after:Timeout, task:Task)
+    func async(after:Timeout, task:SafeTask)
     
     func sync<ReturnType>(task:() throws -> ReturnType) rethrows -> ReturnType
 }
 
-public protocol ExecutionContextType : TaskSchedulerType, ErrorHandlerRegistryType {
+public protocol ExecutionContextType : TaskSchedulerType, ErrorHandlerRegistryType, NonStrictEquatable {
     func execute(task:SafeTask)
+    
+    static var current:ExecutionContextType {get}
 }
 
 public extension ExecutionContextType {
-    func execute(task:SafeTask) {
+    public func execute(task:SafeTask) {
         async(task)
+    }
+    
+    public var isCurrent:Bool {
+        get {
+            return Self.current.isEqualTo(self)
+        }
     }
 }
 
@@ -124,7 +131,7 @@ public extension ErrorHandlerRegistryType where Self : TaskSchedulerType {
     }
     
     //after is in seconds
-    func async(after:Double, task:Task) {
+    public func async(after:Timeout, task:Task) {
         //specify explicitely, that it's safe task
         async(after) { () -> Void in
             do {
@@ -151,18 +158,27 @@ public func executionContext(executor:Executor) -> ExecutionContextType {
     return CustomExecutionContext(executor: executor)
 }
 
-public func sleep(timeout:Double) {
+var currentContext = try! ThreadLocal<ExecutionContextType>()
+
+public extension ExecutionContextType {
+    public static var current:ExecutionContextType {
+        get {
+            if Thread.isMain {
+                return ExecutionContext.main
+            }
+            if currentContext.value == nil {
+                //TODO: think
+//                currentContext.value = RunLoopExecutionContext(inner: <#T##ExecutionContextType#>)
+            }
+            return currentContext.value!
+        }
+    }
+}
+
+/*public func sleep(timeout:Double) {
     let sec = time_t(timeout)
     let nsec = Int((timeout - Double(sec)) * 1000 * 1000 * 1000)//nano seconds
     var time = timespec(tv_sec:sec, tv_nsec: nsec)
     
     nanosleep(&time, nil)
-}
-
-@noreturn public func executionContextMain() {
-    #if !os(Linux) || dispatch
-        dispatch_main()
-    #else
-        RunLoop.runForever()
-    #endif
-}
+}*/

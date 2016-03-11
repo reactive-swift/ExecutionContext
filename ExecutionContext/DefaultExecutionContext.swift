@@ -36,4 +36,8 @@ public protocol DefaultExecutionContextType : ExecutionContextType {
     static var global:ExecutionContextType {
         get
     }
+    
+    /// unfortunately name main() is not allowed
+    @noreturn
+    static func mainProc()
 }
