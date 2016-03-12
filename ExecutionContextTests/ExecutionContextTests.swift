@@ -81,9 +81,9 @@ class ExecutionContextTests: XCTestCase {
         let context:ExecutionContextType = DefaultExecutionContext(kind: .Serial)
         
         syncTest(context)
-//        asyncTest(context)
-//        afterTest(context)
-//        afterTestAdvanced(context)
+        asyncTest(context)
+        afterTest(context)
+        afterTestAdvanced(context)
     }
     
     func testParallel() {
