@@ -16,13 +16,23 @@
 
 import Foundation
 
-#if dispatch
+#if !os(Linux) || dispatch
     
-    public typealias DefaultExecutionContext = RunLoopExecutionContext
+    #if nouv
+        public typealias DefaultExecutionContext = DispatchExecutionContext
+    #else
+        public typealias DefaultExecutionContext = RunLoopExecutionContext
+    #endif
     
 #else
     
-    public typealias DefaultExecutionContext = RunLoopExecutionContext
+    #if nouv
+        private func error() {
+            let error = "You can not use 'nouv' key' without dispatch support"
+        }
+    #else
+        public typealias DefaultExecutionContext = RunLoopExecutionContext
+    #endif
     
 #endif
 

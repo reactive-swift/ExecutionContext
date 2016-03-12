@@ -65,6 +65,10 @@
         }
         
         public func sync<ReturnType>(task:() throws -> ReturnType) rethrows -> ReturnType {
+            if isCurrent {
+                return try task()
+            }
+            
             return try loop.sync {
                 currentContext.value = self
                 return try task()

@@ -167,6 +167,9 @@ public class RunLoopExecutionContext : ExecutionContextBase, ExecutionContextTyp
     }
     
     public func sync<ReturnType>(task:() throws -> ReturnType) rethrows -> ReturnType {
+        if self.isCurrent {
+            return try task()
+        }
         return try inner.sync {
             currentContext.value = self
             return try task()

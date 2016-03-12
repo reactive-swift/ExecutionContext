@@ -113,7 +113,7 @@ class ExecutionContextTests: XCTestCase {
         //afterTestAdvanced - no it will not work here
     }
     
-/*    func testCustomOnGlobal() {
+    func testCustomOnGlobal() {
         let context = executionContext(global.execute)
         
         syncTest(context)
@@ -125,11 +125,11 @@ class ExecutionContextTests: XCTestCase {
     func testCustomOnMain() {
         let context = executionContext(main.execute)
         
-        syncTest(context)
+//        syncTest(context)
         asyncTest(context)
         afterTest(context)
         //afterTestAdvanced - no it will not work here
-    }*/
+    }
     
     func testCustomSimple() {
         let context = executionContext { task in

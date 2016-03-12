@@ -73,6 +73,10 @@ import RunLoop
 
 extension ExecutionContextType {
     func syncThroughAsync<ReturnType>(task:() throws -> ReturnType) rethrows -> ReturnType {
+        if isCurrent {
+            return try task()
+        }
+        
         return try {
             var result:Result<ReturnType, AnyError>?
             
@@ -174,11 +178,3 @@ public extension ExecutionContextType {
         }
     }
 }
-
-/*public func sleep(timeout:Double) {
-    let sec = time_t(timeout)
-    let nsec = Int((timeout - Double(sec)) * 1000 * 1000 * 1000)//nano seconds
-    var time = timespec(tv_sec:sec, tv_nsec: nsec)
-    
-    nanosleep(&time, nil)
-}*/

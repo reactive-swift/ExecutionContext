@@ -69,13 +69,9 @@
 		65D6379D1C9437BB000F5548 /* RunLoopExecutionContext.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = RunLoopExecutionContext.swift; sourceTree = "<group>"; };
 		65D637A41C9437F4000F5548 /* ExecutionContextTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ExecutionContextTests.swift; sourceTree = "<group>"; };
 		65D637A81C94383C000F5548 /* Boilerplate.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; path = Boilerplate.framework; sourceTree = "<group>"; };
-		65D637A91C94383C000F5548 /* Boilerplate.framework.dSYM */ = {isa = PBXFileReference; lastKnownFileType = wrapper.dsym; path = Boilerplate.framework.dSYM; sourceTree = "<group>"; };
 		65D637AA1C94383C000F5548 /* Result.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; path = Result.framework; sourceTree = "<group>"; };
-		65D637AB1C94383C000F5548 /* Result.framework.dSYM */ = {isa = PBXFileReference; lastKnownFileType = wrapper.dsym; path = Result.framework.dSYM; sourceTree = "<group>"; };
 		65D637AC1C94383C000F5548 /* RunLoop.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; path = RunLoop.framework; sourceTree = "<group>"; };
-		65D637AD1C94383C000F5548 /* RunLoop.framework.dSYM */ = {isa = PBXFileReference; lastKnownFileType = wrapper.dsym; path = RunLoop.framework.dSYM; sourceTree = "<group>"; };
 		65D637AE1C94383C000F5548 /* UV.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; path = UV.framework; sourceTree = "<group>"; };
-		65D637AF1C94383C000F5548 /* UV.framework.dSYM */ = {isa = PBXFileReference; lastKnownFileType = wrapper.dsym; path = UV.framework.dSYM; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -127,10 +123,10 @@
 		65D637801C943764000F5548 /* ExecutionContext */ = {
 			isa = PBXGroup;
 			children = (
+				65D6379B1C9437BB000F5548 /* ExecutionContext.swift */,
 				65D637981C9437BB000F5548 /* CustomExecutionContext.swift */,
 				65D637991C9437BB000F5548 /* DefaultExecutionContext.swift */,
 				65D6379A1C9437BB000F5548 /* DispatchExecutionContext.swift */,
-				65D6379B1C9437BB000F5548 /* ExecutionContext.swift */,
 				65D6379C1C9437BB000F5548 /* ImmediateExecutionContext.swift */,
 				65D6379D1C9437BB000F5548 /* RunLoopExecutionContext.swift */,
 				65D637831C943764000F5548 /* Info.plist */,
@@ -160,13 +156,9 @@
 			isa = PBXGroup;
 			children = (
 				65D637A81C94383C000F5548 /* Boilerplate.framework */,
-				65D637A91C94383C000F5548 /* Boilerplate.framework.dSYM */,
 				65D637AA1C94383C000F5548 /* Result.framework */,
-				65D637AB1C94383C000F5548 /* Result.framework.dSYM */,
 				65D637AC1C94383C000F5548 /* RunLoop.framework */,
-				65D637AD1C94383C000F5548 /* RunLoop.framework.dSYM */,
 				65D637AE1C94383C000F5548 /* UV.framework */,
-				65D637AF1C94383C000F5548 /* UV.framework.dSYM */,
 			);
 			path = Mac;
 			sourceTree = "<group>";
@@ -496,6 +488,7 @@
 				65D637941C943764000F5548 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
 		};
 		65D637951C943764000F5548 /* Build configuration list for PBXNativeTarget "ExecutionContextTests" */ = {
 			isa = XCConfigurationList;
@@ -504,6 +497,7 @@
 				65D637971C943764000F5548 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
 	};
