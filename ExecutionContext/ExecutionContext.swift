@@ -105,7 +105,7 @@ public class ExecutionContextBase : ErrorHandlerRegistryType {
     
     public func registerErrorHandler(handler:ErrorHandler) {
         //keep last one as it's stock
-        errorHandlers.insert(handler, at: errorHandlers.endIndex.advancedBy(-1))
+        errorHandlers.insert(handler, at: errorHandlers.endIndex.advanced(by: -1))
     }
 }
 
