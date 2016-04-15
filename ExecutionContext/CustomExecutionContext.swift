@@ -15,6 +15,7 @@
 //===----------------------------------------------------------------------===//
 
 import Foundation
+import Foundation3
 import Boilerplate
 
 public class CustomExecutionContext : ExecutionContextBase, ExecutionContextType {
@@ -52,6 +53,6 @@ public class CustomExecutionContext : ExecutionContextBase, ExecutionContextType
         guard let other = other as? CustomExecutionContext else {
             return false
         }
-        return id.isEqualTo(other.id)
+        return id.isEqual(other.id)
     }
 }
