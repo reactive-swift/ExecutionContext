@@ -15,7 +15,6 @@
 //===----------------------------------------------------------------------===//
 
 import Foundation
-import Result
 import Boilerplate
 import RunLoop
 

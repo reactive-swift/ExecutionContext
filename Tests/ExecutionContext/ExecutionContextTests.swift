@@ -17,6 +17,10 @@
 import XCTest
 @testable import ExecutionContext
 
+#if !os(tvOS)
+    import XCTest3
+#endif
+
 #if os(Linux)
     import Glibc
 #endif
@@ -24,41 +28,42 @@ import XCTest
 import Boilerplate
 import RunLoop
 
+#if !os(tvOS)
 class ExecutionContextTests: XCTestCase {
     //Tests does not create static variables. We need initialized main thread
     //let mainContext = DefaultExecutionContext.main
     
     func syncTest(context:ExecutionContextType) {
         
-        let expectation = self.expectationWithDescription("OK SYNC")
+        let expectation = self.expectation(withDescription: "OK SYNC")
         
         context.sync {
             expectation.fulfill()
         }
         
-        self.waitForExpectationsWithTimeout(0, handler: nil)
+        self.waitForExpectations(withTimeout: 0, handler: nil)
     }
     
     func asyncTest(context:ExecutionContextType) {
         RunLoop.current
-        let expectation = self.expectationWithDescription("OK ASYNC")
+        let expectation = self.expectation(withDescription: "OK ASYNC")
         
         context.async {
             Thread.sleep(1)
             expectation.fulfill()
         }
         
-        self.waitForExpectationsWithTimeout(2, handler: nil)
+        self.waitForExpectations(withTimeout: 2, handler: nil)
     }
     
     func afterTest(context:ExecutionContextType) {
-        let expectation = self.expectationWithDescription("OK AFTER")
+        let expectation = self.expectation(withDescription: "OK AFTER")
         
         context.async(0.5) {
             expectation.fulfill()
         }
         
-        self.waitForExpectationsWithTimeout(3, handler: nil)
+        self.waitForExpectations(withTimeout: 3, handler: nil)
     }
     
     func afterTestAdvanced(context:ExecutionContextType) {
@@ -142,19 +147,20 @@ class ExecutionContextTests: XCTestCase {
         //afterTestAdvanced - no it will not work here
     }
 }
+#endif
 
 #if os(Linux)
-extension ExecutionContextTests : XCTestCaseProvider {
-    var allTests : [(String, () throws -> Void)] {
-        return [
-            ("testSerial", testSerial),
-            ("testParallel", testParallel),
-            ("testGlobal", testGlobal),
-            ("testMain", testMain),
-            ("testCustomOnGlobal", testCustomOnGlobal),
-            ("testCustomOnMain", testCustomOnMain),
-            ("testCustomSimple", testCustomSimple)
-        ]
-    }
+extension ExecutionContextTests {
+	static var allTests : [(String, ExecutionContextTests -> () throws -> Void)] {
+		return [
+			("testSerial", testSerial),
+			("testParallel", testParallel),
+			("testGlobal", testGlobal),
+			("testMain", testMain),
+			("testCustomOnGlobal", testCustomOnGlobal),
+			("testCustomOnMain", testCustomOnMain),
+			("testCustomSimple", testCustomSimple),
+		]
+	}
 }
 #endif

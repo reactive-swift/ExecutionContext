@@ -17,8 +17,8 @@
 #if !os(Linux) || dispatch
     
     import Foundation
+    import Foundation3
     import Dispatch
-    import Result
     import Boilerplate
     import RunLoop
     
@@ -37,7 +37,7 @@
         private let loop:DispatchRunLoop
         
         public required convenience init(kind:ExecutionContextKind) {
-            let id = NSUUID().UUIDString
+            let id = NSUUID().uuidString
             let queue = kind.createDispatchQueue(id)
             self.init(queue: queue)
         }

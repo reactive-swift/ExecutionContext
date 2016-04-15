@@ -16,7 +16,7 @@
                BuildableIdentifier = "primary"
                BlueprintIdentifier = "65D6377D1C943763000F5548"
                BuildableName = "ExecutionContext.framework"
-               BlueprintName = "ExecutionContext"
+               BlueprintName = "ExecutionContext-OSX"
                ReferencedContainer = "container:ExecutionContext.xcodeproj">
             </BuildableReference>
          </BuildActionEntry>
@@ -33,8 +33,8 @@
             <BuildableReference
                BuildableIdentifier = "primary"
                BlueprintIdentifier = "65D637871C943764000F5548"
-               BuildableName = "ExecutionContextTests.xctest"
-               BlueprintName = "ExecutionContextTests"
+               BuildableName = "ExecutionContextTests-OSX.xctest"
+               BlueprintName = "ExecutionContextTests-OSX"
                ReferencedContainer = "container:ExecutionContext.xcodeproj">
             </BuildableReference>
          </TestableReference>
@@ -44,7 +44,7 @@
             BuildableIdentifier = "primary"
             BlueprintIdentifier = "65D6377D1C943763000F5548"
             BuildableName = "ExecutionContext.framework"
-            BlueprintName = "ExecutionContext"
+            BlueprintName = "ExecutionContext-OSX"
             ReferencedContainer = "container:ExecutionContext.xcodeproj">
          </BuildableReference>
       </MacroExpansion>
@@ -66,7 +66,7 @@
             BuildableIdentifier = "primary"
             BlueprintIdentifier = "65D6377D1C943763000F5548"
             BuildableName = "ExecutionContext.framework"
-            BlueprintName = "ExecutionContext"
+            BlueprintName = "ExecutionContext-OSX"
             ReferencedContainer = "container:ExecutionContext.xcodeproj">
          </BuildableReference>
       </MacroExpansion>
@@ -84,7 +84,7 @@
             BuildableIdentifier = "primary"
             BlueprintIdentifier = "65D6377D1C943763000F5548"
             BuildableName = "ExecutionContext.framework"
-            BlueprintName = "ExecutionContext"
+            BlueprintName = "ExecutionContext-OSX"
             ReferencedContainer = "container:ExecutionContext.xcodeproj">
          </BuildableReference>
       </MacroExpansion>
