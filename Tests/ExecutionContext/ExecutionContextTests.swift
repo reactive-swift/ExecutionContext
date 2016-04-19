@@ -48,7 +48,11 @@ class ExecutionContextTests: XCTestCase {
         let expectation = self.expectation(withDescription: "OK ASYNC")
         
         context.async {
-            Thread.sleep(1)
+            if runRunLoop {
+                (RunLoop.current as! RunnableRunLoopType).run(.In(timeout: 1))
+            } else {
+                Thread.sleep(1)
+            }
             expectation.fulfill()
         }
         
@@ -67,7 +71,7 @@ class ExecutionContextTests: XCTestCase {
         }
         
         if runRunLoop {
-            (RunLoop.current as! RunnableRunLoopType).run(.In(timeout: 2))
+            (RunLoop.current as! RunnableRunLoopType).run(.In(timeout: 3))
         }
         
         self.waitForExpectations(withTimeout: 3, handler: nil)
