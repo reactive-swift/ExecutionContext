@@ -116,6 +116,12 @@ class ExecutionContextTests: XCTestCase {
         asyncTest(context)
         afterTest(context)
         //afterTestAdvanced - no it will not work here
+        
+        //We need run loop on Linux
+        #if os(Linux)
+            (RunLoop.main as! RunnableRunLoopType).run()
+        #endif
+        
     }
     
     func testCustomOnGlobal() {
