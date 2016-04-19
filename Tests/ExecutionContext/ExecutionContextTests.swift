@@ -44,8 +44,7 @@ class ExecutionContextTests: XCTestCase {
         self.waitForExpectations(withTimeout: 0, handler: nil)
     }
     
-    func asyncTest(context:ExecutionContextType) {
-        RunLoop.current
+    func asyncTest(context:ExecutionContextType, runRunLoop: Bool = false) {
         let expectation = self.expectation(withDescription: "OK ASYNC")
         
         context.async {
@@ -53,31 +52,47 @@ class ExecutionContextTests: XCTestCase {
             expectation.fulfill()
         }
         
+        if runRunLoop {
+            (RunLoop.current as! RunnableRunLoopType).run(.In(timeout: 2))
+        }
+        
         self.waitForExpectations(withTimeout: 2, handler: nil)
     }
     
-    func afterTest(context:ExecutionContextType) {
+    func afterTest(context:ExecutionContextType, runRunLoop: Bool = false) {
         let expectation = self.expectation(withDescription: "OK AFTER")
         
         context.async(0.5) {
             expectation.fulfill()
         }
         
+        if runRunLoop {
+            (RunLoop.current as! RunnableRunLoopType).run(.In(timeout: 2))
+        }
+        
         self.waitForExpectations(withTimeout: 3, handler: nil)
     }
     
-    func afterTestAdvanced(context:ExecutionContextType) {
+    func afterTestAdvanced(context:ExecutionContextType, runRunLoop: Bool = false) {
         var ok = true
         
         context.async(3) {
             ok = false
         }
         
-        Thread.sleep(2.0)
+        if runRunLoop {
+            (RunLoop.current as! RunnableRunLoopType).run(.In(timeout: 2))
+        } else {
+            Thread.sleep(2.0)
+        }
         
         XCTAssert(ok)
         
-        Thread.sleep(2.0)
+        if runRunLoop {
+            (RunLoop.current as! RunnableRunLoopType).run(.In(timeout: 2))
+        } else {
+            Thread.sleep(2.0)
+        }
         
         XCTAssertFalse(ok)
     }
@@ -111,17 +126,18 @@ class ExecutionContextTests: XCTestCase {
     
     func testMain() {
         let context:ExecutionContextType = DefaultExecutionContext.main
-        
-        syncTest(context)
-        asyncTest(context)
-        afterTest(context)
-        //afterTestAdvanced - no it will not work here
-        
-        //We need run loop on Linux
         #if os(Linux)
-            (RunLoop.main as! RunnableRunLoopType).run(.In(timeout: 2))
+            let runRunLoop = true
+        #else
+            let runRunLoop = false
         #endif
         
+        #if !os(Linux)
+            syncTest(context)
+        #endif
+        asyncTest(context, runRunLoop: runRunLoop)
+        afterTest(context, runRunLoop: runRunLoop)
+        //afterTestAdvanced - no it will not work here
     }
     
     func testCustomOnGlobal() {
@@ -135,16 +151,16 @@ class ExecutionContextTests: XCTestCase {
     
     func testCustomOnMain() {
         let context = executionContext(main.execute)
+        #if os(Linux)
+            let runRunLoop = true
+        #else
+            let runRunLoop = false
+        #endif
         
 //        syncTest(context)
-        asyncTest(context)
-        afterTest(context)
+        asyncTest(context, runRunLoop: runRunLoop)
+        afterTest(context, runRunLoop: runRunLoop)
         //afterTestAdvanced - no it will not work here
-
-        //We need run loop on Linux
-        #if os(Linux)
-            (RunLoop.main as! RunnableRunLoopType).run(.In(timeout: 2))
-        #endif
     }
     
     func testCustomSimple() {
