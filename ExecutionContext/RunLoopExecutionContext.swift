@@ -15,7 +15,6 @@
 //===----------------------------------------------------------------------===//
 
 import Foundation
-import Result
 import Boilerplate
 import RunLoop
 
@@ -71,7 +70,7 @@ private class ParallelContext : ExecutionContextBase, ExecutionContextType {
         guard let other = other as? ParallelContext else {
             return false
         }
-        return id.isEqualTo(other.id)
+        return id.isEqual(other.id)
     }
 }
 

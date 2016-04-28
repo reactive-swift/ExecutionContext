@@ -27,9 +27,9 @@ import Boilerplate
 #endif
 
 // return true if error successfully handled, false otherwise
-public typealias ErrorHandler = (e:ErrorType) throws -> Bool
+public typealias ErrorHandler = (e:ErrorProtocol) throws -> Bool
 
-private func stockErrorHandler(e:ErrorType) throws -> Bool {
+private func stockErrorHandler(e:ErrorProtocol) throws -> Bool {
     let errorName = Mirror(reflecting: e).description
     print(errorName, " was thrown but not handled")
     return true
@@ -105,12 +105,12 @@ public class ExecutionContextBase : ErrorHandlerRegistryType {
     
     public func registerErrorHandler(handler:ErrorHandler) {
         //keep last one as it's stock
-        errorHandlers.insert(handler, atIndex: errorHandlers.endIndex.advancedBy(-1))
+        errorHandlers.insert(handler, at: errorHandlers.endIndex.advanced(by: -1))
     }
 }
 
 public extension ErrorHandlerRegistryType where Self : TaskSchedulerType {
-    func handleError(e:ErrorType) {
+    func handleError(e:ErrorProtocol) {
         for handler in errorHandlers {
             do {
                 if try handler(e: e) {
