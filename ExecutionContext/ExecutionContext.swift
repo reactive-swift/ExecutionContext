@@ -148,8 +148,8 @@ public extension ErrorHandlerRegistryType where Self : TaskSchedulerType {
 }
 
 public enum ExecutionContextKind {
-    case Serial
-    case Parallel
+    case serial
+    case parallel
 }
 
 public typealias ExecutionContext = DefaultExecutionContext

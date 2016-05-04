@@ -25,9 +25,9 @@
     private extension ExecutionContextKind {
         func createDispatchQueue(id:String) -> dispatch_queue_t! {
             switch self {
-            case .Serial:
+            case .serial:
                 return dispatch_queue_create(id, DISPATCH_QUEUE_SERIAL)
-            case .Parallel:
+            case .parallel:
                 return dispatch_queue_create(id, DISPATCH_QUEUE_CONCURRENT)
             }
         }
