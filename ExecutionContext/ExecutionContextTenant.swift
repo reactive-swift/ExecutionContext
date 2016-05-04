@@ -19,5 +19,7 @@ public protocol ExecutionContextTenantProtocol {
 }
 
 public protocol MovableExecutionContextTenantProtocol : ExecutionContextTenantProtocol {
-    func settleIn(context:ExecutionContextType) -> Self
+    associatedtype SettledTenant
+    
+    func settleIn(context:ExecutionContextType) -> SettledTenant
 }
