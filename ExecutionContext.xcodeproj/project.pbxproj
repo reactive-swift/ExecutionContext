@@ -21,7 +21,6 @@
 		92E409291CBC3371001ED069 /* DefaultExecutionContext.swift in Sources */ = {isa = PBXBuildFile; fileRef = 65D637991C9437BB000F5548 /* DefaultExecutionContext.swift */; };
 		92E4092A1CBC3374001ED069 /* DispatchExecutionContext.swift in Sources */ = {isa = PBXBuildFile; fileRef = 65D6379A1C9437BB000F5548 /* DispatchExecutionContext.swift */; };
 		92E4092B1CBC3378001ED069 /* ImmediateExecutionContext.swift in Sources */ = {isa = PBXBuildFile; fileRef = 65D6379C1C9437BB000F5548 /* ImmediateExecutionContext.swift */; };
-		92E4092C1CBC337B001ED069 /* RunLoopExecutionContext.swift in Sources */ = {isa = PBXBuildFile; fileRef = 65D6379D1C9437BB000F5548 /* RunLoopExecutionContext.swift */; };
 		92E409361CBC3427001ED069 /* Boilerplate.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 92E4092E1CBC33F9001ED069 /* Boilerplate.framework */; };
 		92E409371CBC3427001ED069 /* Foundation3.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 92E4092F1CBC33F9001ED069 /* Foundation3.framework */; };
 		92E409381CBC3427001ED069 /* Result.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 92E409301CBC33F9001ED069 /* Result.framework */; };
@@ -59,7 +58,6 @@
 		92E40A111CC10713001ED069 /* DefaultExecutionContext.swift in Sources */ = {isa = PBXBuildFile; fileRef = 65D637991C9437BB000F5548 /* DefaultExecutionContext.swift */; };
 		92E40A121CC10713001ED069 /* DispatchExecutionContext.swift in Sources */ = {isa = PBXBuildFile; fileRef = 65D6379A1C9437BB000F5548 /* DispatchExecutionContext.swift */; };
 		92E40A131CC10713001ED069 /* ImmediateExecutionContext.swift in Sources */ = {isa = PBXBuildFile; fileRef = 65D6379C1C9437BB000F5548 /* ImmediateExecutionContext.swift */; };
-		92E40A141CC10713001ED069 /* RunLoopExecutionContext.swift in Sources */ = {isa = PBXBuildFile; fileRef = 65D6379D1C9437BB000F5548 /* RunLoopExecutionContext.swift */; };
 		92E40A151CC10717001ED069 /* ExecutionContextTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 65D637A41C9437F4000F5548 /* ExecutionContextTests.swift */; };
 		92E40A161CC10718001ED069 /* ExecutionContextTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 65D637A41C9437F4000F5548 /* ExecutionContextTests.swift */; };
 		92E40A1C1CC10761001ED069 /* Boilerplate.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 92E40A181CC10761001ED069 /* Boilerplate.framework */; };
@@ -79,7 +77,6 @@
 		92E40A381CC10816001ED069 /* DefaultExecutionContext.swift in Sources */ = {isa = PBXBuildFile; fileRef = 65D637991C9437BB000F5548 /* DefaultExecutionContext.swift */; };
 		92E40A391CC10816001ED069 /* DispatchExecutionContext.swift in Sources */ = {isa = PBXBuildFile; fileRef = 65D6379A1C9437BB000F5548 /* DispatchExecutionContext.swift */; };
 		92E40A3A1CC10816001ED069 /* ImmediateExecutionContext.swift in Sources */ = {isa = PBXBuildFile; fileRef = 65D6379C1C9437BB000F5548 /* ImmediateExecutionContext.swift */; };
-		92E40A3B1CC10816001ED069 /* RunLoopExecutionContext.swift in Sources */ = {isa = PBXBuildFile; fileRef = 65D6379D1C9437BB000F5548 /* RunLoopExecutionContext.swift */; };
 		92E40A411CC10895001ED069 /* Boilerplate.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 92E40A3D1CC10895001ED069 /* Boilerplate.framework */; };
 		92E40A421CC10895001ED069 /* Foundation3.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 92E40A3E1CC10895001ED069 /* Foundation3.framework */; };
 		92E40A431CC10895001ED069 /* Result.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 92E40A3F1CC10895001ED069 /* Result.framework */; };
@@ -688,7 +685,6 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				92E4092C1CBC337B001ED069 /* RunLoopExecutionContext.swift in Sources */,
 				92E409271CBC3369001ED069 /* ExecutionContext.swift in Sources */,
 				92E409291CBC3371001ED069 /* DefaultExecutionContext.swift in Sources */,
 				92E4092B1CBC3378001ED069 /* ImmediateExecutionContext.swift in Sources */,
@@ -709,7 +705,6 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				92E40A141CC10713001ED069 /* RunLoopExecutionContext.swift in Sources */,
 				92E40A0F1CC10713001ED069 /* ExecutionContext.swift in Sources */,
 				92E40A111CC10713001ED069 /* DefaultExecutionContext.swift in Sources */,
 				92E40A131CC10713001ED069 /* ImmediateExecutionContext.swift in Sources */,
@@ -730,7 +725,6 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				92E40A3B1CC10816001ED069 /* RunLoopExecutionContext.swift in Sources */,
 				92E40A361CC10816001ED069 /* ExecutionContext.swift in Sources */,
 				92E40A381CC10816001ED069 /* DefaultExecutionContext.swift in Sources */,
 				92E40A3A1CC10816001ED069 /* ImmediateExecutionContext.swift in Sources */,
@@ -949,6 +943,7 @@
 				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Frameworks";
 				IPHONEOS_DEPLOYMENT_TARGET = 8.0;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
+				OTHER_SWIFT_FLAGS = "-Dnouv";
 				PRODUCT_BUNDLE_IDENTIFIER = xyz.crossroadlabs.ExecutionContext;
 				PRODUCT_NAME = "$(PROJECT_NAME)";
 				SDKROOT = iphoneos;
@@ -974,6 +969,7 @@
 				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Frameworks";
 				IPHONEOS_DEPLOYMENT_TARGET = 8.0;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
+				OTHER_SWIFT_FLAGS = "-Dnouv";
 				PRODUCT_BUNDLE_IDENTIFIER = xyz.crossroadlabs.ExecutionContext;
 				PRODUCT_NAME = "$(PROJECT_NAME)";
 				SDKROOT = iphoneos;
@@ -1035,6 +1031,7 @@
 				INFOPLIST_FILE = ExecutionContext/Info.plist;
 				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Frameworks";
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
+				OTHER_SWIFT_FLAGS = "-Dnouv";
 				PRODUCT_BUNDLE_IDENTIFIER = xyz.crossroadlabs.ExecutionContext;
 				PRODUCT_NAME = "$(PROJECT_NAME)";
 				SDKROOT = appletvos;
@@ -1059,6 +1056,7 @@
 				INFOPLIST_FILE = ExecutionContext/Info.plist;
 				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Frameworks";
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
+				OTHER_SWIFT_FLAGS = "-Dnouv";
 				PRODUCT_BUNDLE_IDENTIFIER = xyz.crossroadlabs.ExecutionContext;
 				PRODUCT_NAME = "$(PROJECT_NAME)";
 				SDKROOT = appletvos;
@@ -1120,6 +1118,7 @@
 				INFOPLIST_FILE = ExecutionContext/Info.plist;
 				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Frameworks";
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
+				OTHER_SWIFT_FLAGS = "-Dnouv";
 				PRODUCT_BUNDLE_IDENTIFIER = xyz.crossroadlabs.ExecutionContext;
 				PRODUCT_NAME = "$(PROJECT_NAME)";
 				SDKROOT = watchos;
@@ -1145,6 +1144,7 @@
 				INFOPLIST_FILE = ExecutionContext/Info.plist;
 				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Frameworks";
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
+				OTHER_SWIFT_FLAGS = "-Dnouv";
 				PRODUCT_BUNDLE_IDENTIFIER = xyz.crossroadlabs.ExecutionContext;
 				PRODUCT_NAME = "$(PROJECT_NAME)";
 				SDKROOT = watchos;
@@ -1210,6 +1210,7 @@
 				92E40A0B1CC10677001ED069 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
 		};
 		92E40A0C1CC10677001ED069 /* Build configuration list for PBXNativeTarget "ExecutionContextTests-tvOS" */ = {
 			isa = XCConfigurationList;
@@ -1218,6 +1219,7 @@
 				92E40A0E1CC10677001ED069 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
 		};
 		92E40A331CC107D0001ED069 /* Build configuration list for PBXNativeTarget "ExecutionContext-watchOS" */ = {
 			isa = XCConfigurationList;
@@ -1226,6 +1228,7 @@
 				92E40A351CC107D0001ED069 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
 	};
