@@ -148,8 +148,8 @@ public extension ErrorHandlerRegistryType where Self : TaskSchedulerType {
 }
 
 public enum ExecutionContextKind {
-    case Serial
-    case Parallel
+    case serial
+    case parallel
 }
 
 public typealias ExecutionContext = DefaultExecutionContext
@@ -175,6 +175,18 @@ public extension ExecutionContextType {
 //                currentContext.value = RunLoopExecutionContext(inner: <#T##ExecutionContextType#>)
             }
             return currentContext.value!
+        }
+    }
+}
+
+public extension ExecutionContextType {
+    //if context is current - executes immediately. Schedules to the context otherwise
+    public func immediateIfCurrent(task:SafeTask) {
+        //can avoid first check but is here for optimization
+        if immediate.isEqualTo(self) || isCurrent {
+            task()
+        } else {
+            execute(task)
         }
     }
 }

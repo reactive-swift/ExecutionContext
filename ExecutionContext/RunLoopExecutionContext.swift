@@ -132,9 +132,9 @@ private class SerialContext : ExecutionContextBase, ExecutionContextType {
 private extension ExecutionContextKind {
     func createInnerContext() -> ExecutionContextType {
         switch self {
-        case .Serial:
+        case .serial:
             return SerialContext()
-        case .Parallel:
+        case .parallel:
             return ParallelContext()
         }
     }
@@ -183,7 +183,7 @@ public class RunLoopExecutionContext : ExecutionContextBase, ExecutionContextTyp
     }
     
     public static let main:ExecutionContextType = RunLoopExecutionContext(inner: SerialContext(runLoop: RunLoop.main))
-    public static let global:ExecutionContextType = RunLoopExecutionContext(kind: .Parallel)
+    public static let global:ExecutionContextType = RunLoopExecutionContext(kind: .parallel)
     
     @noreturn
     public static func mainProc() {

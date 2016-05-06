@@ -102,7 +102,7 @@ class ExecutionContextTests: XCTestCase {
     }
     
     func testSerial() {
-        let context:ExecutionContextType = DefaultExecutionContext(kind: .Serial)
+        let context:ExecutionContextType = DefaultExecutionContext(kind: .serial)
         
         syncTest(context)
         asyncTest(context)
@@ -111,7 +111,7 @@ class ExecutionContextTests: XCTestCase {
     }
     
     func testParallel() {
-        let context:ExecutionContextType = DefaultExecutionContext(kind: .Parallel)
+        let context:ExecutionContextType = DefaultExecutionContext(kind: .parallel)
         
         syncTest(context)
         asyncTest(context)
