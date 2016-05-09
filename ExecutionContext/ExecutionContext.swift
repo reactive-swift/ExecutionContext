@@ -54,7 +54,36 @@ public protocol TaskSchedulerType {
 public protocol ExecutionContextType : TaskSchedulerType, ErrorHandlerRegistryType, NonStrictEquatable {
     func execute(task:SafeTask)
     
+    var kind:ExecutionContextKind {get}
+    
+    //in case of parallel contexts should return serial context bound to this parallel context. Returns self if already serial
+    var serial:ExecutionContextType {get}
+    
+    //in case of serial that is bound to a parallel context should return a parrallel context it is bound to. Returns "global" if it's not bound to any parallel context
+    var parallel:ExecutionContextType {get}
+    
     static var current:ExecutionContextType {get}
+}
+
+//DUMMY IMPLEMENTATION TO MAINTAIN BUILDABLE CODE. SUBJECT TO BE REMOVED ASAP
+public extension ExecutionContextType {
+    public var kind:ExecutionContextKind {
+        get {
+            return .serial
+        }
+    }
+    
+    var serial:ExecutionContextType {
+        get {
+            return self
+        }
+    }
+    
+    var parallel:ExecutionContextType {
+        get {
+            return global
+        }
+    }
 }
 
 public extension ExecutionContextType {
