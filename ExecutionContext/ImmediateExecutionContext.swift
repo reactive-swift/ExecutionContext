@@ -17,7 +17,7 @@
 import Foundation
 import Boilerplate
 
-class ImmediateExecutionContext : ExecutionContextBase, ExecutionContextType {
+class ImmediateExecutionContext : ExecutionContextBase, ExecutionContextProtocol {
     func async(task:SafeTask) {
         let context = currentContext.value
         defer {
@@ -30,12 +30,12 @@ class ImmediateExecutionContext : ExecutionContextBase, ExecutionContextType {
     
     func async(after:Timeout, task:SafeTask) {
         async {
-            Thread.sleep(after)
+            Thread.sleep(timeout: after)
             task()
         }
     }
     
-    func sync<ReturnType>(task:() throws -> ReturnType) rethrows -> ReturnType {
+    func sync<ReturnType>(task:TaskWithResult<ReturnType>) rethrows -> ReturnType {
         let context = currentContext.value
         defer {
             currentContext.value = context
@@ -45,7 +45,7 @@ class ImmediateExecutionContext : ExecutionContextBase, ExecutionContextType {
         return try task()
     }
     
-    func isEqualTo(other:NonStrictEquatable) -> Bool {
+    func isEqual(to other:NonStrictEquatable) -> Bool {
         return other is ImmediateExecutionContext
     }
 }

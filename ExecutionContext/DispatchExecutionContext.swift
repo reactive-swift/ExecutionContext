@@ -17,32 +17,31 @@
 #if !os(Linux) || dispatch
     
     import Foundation
-    import Foundation3
     import Dispatch
     import Boilerplate
     import RunLoop
     
     private extension ExecutionContextKind {
-        func createDispatchQueue(id:String) -> dispatch_queue_t! {
+        func createDispatchQueue(id:String) -> DispatchQueue {
             switch self {
             case .serial:
-                return dispatch_queue_create(id, DISPATCH_QUEUE_SERIAL)
+                return DispatchQueue(label: id)
             case .parallel:
-                return dispatch_queue_create(id, DISPATCH_QUEUE_CONCURRENT)
+                return DispatchQueue(label: id, attributes: .concurrent)
             }
         }
     }
     
-    public class DispatchExecutionContext : ExecutionContextBase, ExecutionContextType, DefaultExecutionContextType {
+    public class DispatchExecutionContext : ExecutionContextBase, ExecutionContextProtocol, DefaultExecutionContextProtocol {
         private let loop:DispatchRunLoop
         
         public required convenience init(kind:ExecutionContextKind) {
             let id = NSUUID().uuidString
-            let queue = kind.createDispatchQueue(id)
+            let queue = kind.createDispatchQueue(id: id)
             self.init(queue: queue)
         }
         
-        public init(queue:dispatch_queue_t) {
+        public init(queue:DispatchQueue) {
             self.loop = DispatchRunLoop(queue: queue)
             super.init()
             loop.execute {
@@ -58,13 +57,13 @@
         }
         
         public func async(after:Timeout, task:SafeTask) {
-            loop.execute(after) {
+            loop.execute(delay: after) {
                 currentContext.value = self
                 task()
             }
         }
         
-        public func sync<ReturnType>(task:() throws -> ReturnType) rethrows -> ReturnType {
+        public func sync<ReturnType>(task:TaskWithResult<ReturnType>) rethrows -> ReturnType {
             if isCurrent {
                 return try task()
             }
@@ -75,23 +74,22 @@
             }
         }
         
-        public static let main:ExecutionContextType = DispatchExecutionContext(queue: dispatch_get_main_queue())
-        public static let global:ExecutionContextType = DispatchExecutionContext(queue: dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0))
+        public static let main:ExecutionContextProtocol = DispatchExecutionContext(queue: .main)
+        public static let global:ExecutionContextProtocol = DispatchExecutionContext(queue: .global())
         
-        @noreturn
-        public static func mainProc() {
+        public static func mainProc() -> Never  {
             if !Thread.isMain {
                 print("Main proc was called on non-main thread. Exiting")
                 exit(1)
             }
-            dispatch_main()
+            dispatchMain()
         }
         
-        public func isEqualTo(other: NonStrictEquatable) -> Bool {
+        public func isEqual(to other: NonStrictEquatable) -> Bool {
             guard let other = other as? DispatchExecutionContext else {
                 return false
             }
-            return loop.isEqualTo(other.loop)
+            return loop.isEqual(to: other.loop)
         }
     }
 

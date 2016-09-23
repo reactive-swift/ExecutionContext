@@ -18,10 +18,10 @@ import Foundation
 
 #if !os(Linux) || dispatch
     
-    #if nouv
-        public typealias DefaultExecutionContext = DispatchExecutionContext
-    #else
+    #if uv
         public typealias DefaultExecutionContext = RunLoopExecutionContext
+    #else
+        public typealias DefaultExecutionContext = DispatchExecutionContext
     #endif
     
 #else
@@ -36,18 +36,17 @@ import Foundation
     
 #endif
 
-public protocol DefaultExecutionContextType : ExecutionContextType {
+public protocol DefaultExecutionContextProtocol : ExecutionContextProtocol {
     init(kind:ExecutionContextKind)
     
-    static var main:ExecutionContextType {
+    static var main:ExecutionContextProtocol {
         get
     }
     
-    static var global:ExecutionContextType {
+    static var global:ExecutionContextProtocol {
         get
     }
     
     /// unfortunately name main() is not allowed
-    @noreturn
-    static func mainProc()
+    static func mainProc() -> Never
 }

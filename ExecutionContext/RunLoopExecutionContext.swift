@@ -18,27 +18,27 @@ import Foundation
 import Boilerplate
 import RunLoop
 
-private class ParallelContext : ExecutionContextBase, ExecutionContextType {
+private class ParallelContext : ExecutionContextBase, ExecutionContextProtocol {
     let id = NSUUID()
     
     func runAsync(task:SafeTask) {
         do {
             try Thread.detach {
-/*                if (!RunLoop.trySetFactory {
+                if (!RunLoop.trySetFactory {
                     return RunLoop()
                 }) {
                     print("unable to set run loop")
                     exit(1)
-                }*/
+                }
                 
-                guard let loop = RunLoop.current as? RunnableRunLoopType else {
+                guard let loop = RunLoop.current as? RunnableRunLoopProtocol else {
                     print("unable to run run loop")
                     exit(1)
                 }
                 
-                loop.execute(task)
+                loop.execute(task: task)
                 
-                loop.run()
+                let _ = loop.run()
             }
         } catch let e as CError {
             switch e {
@@ -53,20 +53,20 @@ private class ParallelContext : ExecutionContextBase, ExecutionContextType {
     }
     
     func async(task:SafeTask) {
-        runAsync(task)
+        runAsync(task: task)
     }
     
     func async(after:Timeout, task:SafeTask) {
         runAsync {
-            RunLoop.current.execute(after, task: task)
+            RunLoop.current!.execute(delay: after, task: task)
         }
     }
     
-    func sync<ReturnType>(task:() throws -> ReturnType) rethrows -> ReturnType {
-        return try syncThroughAsync(task)
+    func sync<ReturnType>(task:TaskWithResult<ReturnType>) rethrows -> ReturnType {
+        return try syncThroughAsync(task: task)
     }
     
-    func isEqualTo(other: NonStrictEquatable) -> Bool {
+    func isEqual(to other: NonStrictEquatable) -> Bool {
         guard let other = other as? ParallelContext else {
             return false
         }
@@ -74,31 +74,31 @@ private class ParallelContext : ExecutionContextBase, ExecutionContextType {
     }
 }
 
-private class SerialContext : ExecutionContextBase, ExecutionContextType {
-    private let loop:RunnableRunLoopType
+private class SerialContext : ExecutionContextBase, ExecutionContextProtocol {
+    private let loop:RunnableRunLoopProtocol
     
     override init() {
         let sema = BlockingSemaphore()
-        let loop = MutableAnyContainer<RunnableRunLoopType?>(nil)
+        let loop = MutableAnyContainer<RunnableRunLoopProtocol?>(nil)
         
         //yeah, fail for now
         try! Thread.detach {
-            var _loop = (RunLoop.current as! RunnableRunLoopType)
+            var _loop = (RunLoop.current as! RunnableRunLoopProtocol)
             loop.content = _loop
             
-            sema.signal()
+            let _ = sema.signal()
             
             _loop.protected = true
-            _loop.run()
+            let _ = _loop.run()
         }
         
-        sema.wait()
+        let _ = sema.wait()
         
         self.loop = loop.content!
     }
     
-    init(runLoop:RunLoopType) {
-        loop = runLoop as! RunnableRunLoopType
+    init(runLoop:RunLoopProtocol) {
+        loop = runLoop as! RunnableRunLoopProtocol
     }
     
     deinit {
@@ -110,27 +110,27 @@ private class SerialContext : ExecutionContextBase, ExecutionContextType {
     }
     
     func async(task:SafeTask) {
-        loop.execute(task)
+        loop.execute(task: task)
     }
     
     func async(after:Timeout, task:SafeTask) {
-        loop.execute(after, task: task)
+        loop.execute(delay: after, task: task)
     }
     
-    func sync<ReturnType>(task:() throws -> ReturnType) rethrows -> ReturnType {
-        return try loop.sync(task)
+    func sync<ReturnType>(task:TaskWithResult<ReturnType>) rethrows -> ReturnType {
+        return try loop.sync(task: task)
     }
     
-    func isEqualTo(other: NonStrictEquatable) -> Bool {
+    func isEqual(to other: NonStrictEquatable) -> Bool {
         guard let other = other as? SerialContext else {
             return false
         }
-        return loop.isEqualTo(other.loop)
+        return loop.isEqual(to: other.loop)
     }
 }
 
 private extension ExecutionContextKind {
-    func createInnerContext() -> ExecutionContextType {
+    func createInnerContext() -> ExecutionContextProtocol {
         switch self {
         case .serial:
             return SerialContext()
@@ -140,10 +140,10 @@ private extension ExecutionContextKind {
     }
 }
 
-public class RunLoopExecutionContext : ExecutionContextBase, ExecutionContextType, DefaultExecutionContextType {
-    let inner:ExecutionContextType
+public class RunLoopExecutionContext : ExecutionContextBase, ExecutionContextProtocol, DefaultExecutionContextProtocol {
+    let inner:ExecutionContextProtocol
     
-    init(inner:ExecutionContextType) {
+    init(inner:ExecutionContextProtocol) {
         self.inner = inner
     }
     
@@ -159,13 +159,13 @@ public class RunLoopExecutionContext : ExecutionContextBase, ExecutionContextTyp
     }
     
     public func async(after:Timeout, task:SafeTask) {
-        inner.async(after) {
+        inner.async(after: after) {
             currentContext.value = self
             task()
         }
     }
     
-    public func sync<ReturnType>(task:() throws -> ReturnType) rethrows -> ReturnType {
+    public func sync<ReturnType>(task:TaskWithResult<ReturnType>) rethrows -> ReturnType {
         if self.isCurrent {
             return try task()
         }
@@ -175,26 +175,27 @@ public class RunLoopExecutionContext : ExecutionContextBase, ExecutionContextTyp
         }
     }
     
-    public func isEqualTo(other: NonStrictEquatable) -> Bool {
+    public func isEqual(to other: NonStrictEquatable) -> Bool {
         guard let other = other as? RunLoopExecutionContext else {
             return false
         }
-        return inner.isEqualTo(other.inner)
+        return inner.isEqual(to: other.inner)
     }
     
-    public static let main:ExecutionContextType = RunLoopExecutionContext(inner: SerialContext(runLoop: RunLoop.main))
-    public static let global:ExecutionContextType = RunLoopExecutionContext(kind: .parallel)
+    public static let main:ExecutionContextProtocol = RunLoopExecutionContext(inner: SerialContext(runLoop: RunLoop.main))
+    public static let global:ExecutionContextProtocol = RunLoopExecutionContext(kind: .parallel)
     
-    @noreturn
-    public static func mainProc() {
+    
+    public static func mainProc() -> Never {
         if !Thread.isMain {
             print("Main proc was called on non-main thread. Exiting")
             exit(1)
         }
-        var loop = (RunLoop.main as! RunnableRunLoopType)
+        var loop = (RunLoop.reactive.main as! RunnableRunLoopProtocol)
         loop.protected = true
         while true {
-            loop.run()
+            //Should we exit here somehow? quit the process?
+            let _ = loop.run()
         }
     }
 }

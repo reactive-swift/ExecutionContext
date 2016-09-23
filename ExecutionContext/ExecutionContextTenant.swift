@@ -15,11 +15,11 @@
 //===----------------------------------------------------------------------===//
 
 public protocol ExecutionContextTenantProtocol {
-    var context:ExecutionContextType {get}
+    var context:ExecutionContextProtocol {get}
 }
 
 public protocol MovableExecutionContextTenantProtocol : ExecutionContextTenantProtocol {
     associatedtype SettledTenant
     
-    func settle(in context:ExecutionContextType) -> SettledTenant
+    func settle(in context:ExecutionContextProtocol) -> SettledTenant
 }
