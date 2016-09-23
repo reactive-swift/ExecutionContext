@@ -1,4 +1,4 @@
-//===--- Package.swift ----------------------------------------------------===//
+//===--- ExecutionContextTenant.swift ------------------------------------------------------===//
 //Copyright (c) 2016 Daniel Leping (dileping)
 //
 //Licensed under the Apache License, Version 2.0 (the "License");
@@ -14,15 +14,12 @@
 //limitations under the License.
 //===----------------------------------------------------------------------===//
 
-import PackageDescription
+public protocol ExecutionContextTenantProtocol {
+    var context:ExecutionContextType {get}
+}
 
-let package = Package(
-    name: "ExecutionContext",
-    targets: [Target(name: "ExecutionContext")],
-    dependencies: [
-        .Package(url: "https://github.com/antitypical/Result.git", majorVersion: 2),
-        .Package(url: "https://github.com/crossroadlabs/Boilerplate.git", majorVersion: 0, minor: 1),
-        .Package(url: "https://github.com/crossroadlabs/XCTest3.git", majorVersion: 0, minor: 1),
-        .Package(url: "https://github.com/reactive-swift/RunLoop.git", majorVersion: 0, minor: 1),
-    ]
-)
+public protocol MovableExecutionContextTenantProtocol : ExecutionContextTenantProtocol {
+    associatedtype SettledTenant
+    
+    func settle(in context:ExecutionContextType) -> SettledTenant
+}

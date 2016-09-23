@@ -17,63 +17,92 @@
 import XCTest
 @testable import ExecutionContext
 
+#if !os(tvOS)
+    import XCTest3
+#endif
+
 #if os(Linux)
     import Glibc
 #endif
 
+import Boilerplate
+import RunLoop
+
+#if !os(tvOS)
 class ExecutionContextTests: XCTestCase {
     //Tests does not create static variables. We need initialized main thread
     //let mainContext = DefaultExecutionContext.main
     
     func syncTest(context:ExecutionContextType) {
-        let expectation = self.expectationWithDescription("OK SYNC")
+        
+        let expectation = self.expectation(withDescription: "OK SYNC")
         
         context.sync {
             expectation.fulfill()
         }
         
-        self.waitForExpectationsWithTimeout(0, handler: nil)
+        self.waitForExpectations(withTimeout: 0, handler: nil)
     }
     
-    func asyncTest(context:ExecutionContextType) {
-        let expectation = self.expectationWithDescription("OK ASYNC")
+    func asyncTest(context:ExecutionContextType, runRunLoop: Bool = false) {
+        let expectation = self.expectation(withDescription: "OK ASYNC")
         
         context.async {
-            sleep(1.0)
+            if runRunLoop {
+                (RunLoop.current as! RunnableRunLoopType).run(.In(timeout: 1))
+            } else {
+                Thread.sleep(1)
+            }
             expectation.fulfill()
         }
         
-        self.waitForExpectationsWithTimeout(2, handler: nil)
+        if runRunLoop {
+            (RunLoop.current as! RunnableRunLoopType).run(.In(timeout: 2))
+        }
+        
+        self.waitForExpectations(withTimeout: 2, handler: nil)
     }
     
-    func afterTest(context:ExecutionContextType) {
-        let expectation = self.expectationWithDescription("OK AFTER")
+    func afterTest(context:ExecutionContextType, runRunLoop: Bool = false) {
+        let expectation = self.expectation(withDescription: "OK AFTER")
         
         context.async(0.5) {
             expectation.fulfill()
         }
         
-        self.waitForExpectationsWithTimeout(3, handler: nil)
+        if runRunLoop {
+            (RunLoop.current as! RunnableRunLoopType).run(.In(timeout: 3))
+        }
+        
+        self.waitForExpectations(withTimeout: 3, handler: nil)
     }
     
-    func afterTestAdvanced(context:ExecutionContextType) {
+    func afterTestAdvanced(context:ExecutionContextType, runRunLoop: Bool = false) {
         var ok = true
         
         context.async(3) {
             ok = false
         }
         
-        sleep(2.0)
+        if runRunLoop {
+            (RunLoop.current as! RunnableRunLoopType).run(.In(timeout: 2))
+        } else {
+            Thread.sleep(2.0)
+        }
         
         XCTAssert(ok)
         
-        sleep(2.0)
+        if runRunLoop {
+            (RunLoop.current as! RunnableRunLoopType).run(.In(timeout: 2))
+        } else {
+            Thread.sleep(2.0)
+        }
         
         XCTAssertFalse(ok)
     }
     
     func testSerial() {
-        let context:ExecutionContextType = DefaultExecutionContext(kind: .Serial)
+        let context:ExecutionContextType = DefaultExecutionContext(kind: .serial)
         
         syncTest(context)
         asyncTest(context)
@@ -82,7 +111,7 @@ class ExecutionContextTests: XCTestCase {
     }
     
     func testParallel() {
-        let context:ExecutionContextType = DefaultExecutionContext(kind: .Parallel)
+        let context:ExecutionContextType = DefaultExecutionContext(kind: .parallel)
         
         syncTest(context)
         asyncTest(context)
@@ -101,10 +130,17 @@ class ExecutionContextTests: XCTestCase {
     
     func testMain() {
         let context:ExecutionContextType = DefaultExecutionContext.main
+        #if os(Linux)
+            let runRunLoop = true
+        #else
+            let runRunLoop = false
+        #endif
         
-        syncTest(context)
-        asyncTest(context)
-        afterTest(context)
+        #if !os(Linux)
+            syncTest(context)
+        #endif
+        asyncTest(context, runRunLoop: runRunLoop)
+        afterTest(context, runRunLoop: runRunLoop)
         //afterTestAdvanced - no it will not work here
     }
     
@@ -119,10 +155,15 @@ class ExecutionContextTests: XCTestCase {
     
     func testCustomOnMain() {
         let context = executionContext(main.execute)
+        #if os(Linux)
+            let runRunLoop = true
+        #else
+            let runRunLoop = false
+        #endif
         
-        syncTest(context)
-        asyncTest(context)
-        afterTest(context)
+//        syncTest(context)
+        asyncTest(context, runRunLoop: runRunLoop)
+        afterTest(context, runRunLoop: runRunLoop)
         //afterTestAdvanced - no it will not work here
     }
     
@@ -136,39 +177,21 @@ class ExecutionContextTests: XCTestCase {
         afterTest(context)
         //afterTestAdvanced - no it will not work here
     }
-    
-    func testSemaphore() {
-        let sema = Semaphore(value: 1)
-        var n = 0
-        for _ in [0...100] {
-            global.execute {
-                sema.willUse()
-                defer {
-                    sema.didUse()
-                }
-                sema.wait()
-                XCTAssert(n == 0, "Should always be zero")
-                n += 1
-                sleep(0.1)
-                n -= 1
-                sema.signal()
-            }
-        }
-    }
 }
+#endif
 
 #if os(Linux)
-extension ExecutionContextTests : XCTestCaseProvider {
-    var allTests : [(String, () throws -> Void)] {
-        return [
-            ("testSerial", testSerial),
-            ("testParallel", testParallel),
-            ("testGlobal", testGlobal),
-            ("testMain", testMain),
-            ("testCustomOnGlobal", testCustomOnGlobal),
-            ("testCustomOnMain", testCustomOnMain),
-            ("testCustomSimple", testCustomSimple)
-        ]
-    }
+extension ExecutionContextTests {
+	static var allTests : [(String, ExecutionContextTests -> () throws -> Void)] {
+		return [
+			("testSerial", testSerial),
+			("testParallel", testParallel),
+			("testGlobal", testGlobal),
+			("testMain", testMain),
+			("testCustomOnGlobal", testCustomOnGlobal),
+			("testCustomOnMain", testCustomOnMain),
+			("testCustomSimple", testCustomSimple),
+		]
+	}
 }
 #endif

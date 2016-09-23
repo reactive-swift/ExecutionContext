@@ -18,11 +18,21 @@ import Foundation
 
 #if !os(Linux) || dispatch
     
-    public typealias DefaultExecutionContext = DispatchExecutionContext
+    #if nouv
+        public typealias DefaultExecutionContext = DispatchExecutionContext
+    #else
+        public typealias DefaultExecutionContext = RunLoopExecutionContext
+    #endif
     
 #else
     
-    public typealias DefaultExecutionContext = PThreadExecutionContext
+    #if nouv
+        private func error() {
+            let error = "You can not use 'nouv' key' without dispatch support"
+        }
+    #else
+        public typealias DefaultExecutionContext = RunLoopExecutionContext
+    #endif
     
 #endif
 
@@ -36,4 +46,8 @@ public protocol DefaultExecutionContextType : ExecutionContextType {
     static var global:ExecutionContextType {
         get
     }
+    
+    /// unfortunately name main() is not allowed
+    @noreturn
+    static func mainProc()
 }
