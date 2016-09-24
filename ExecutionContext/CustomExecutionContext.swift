@@ -21,11 +21,11 @@ public class CustomExecutionContext : ExecutionContextBase, ExecutionContextProt
     let id = NSUUID()
     let executor:Executor
     
-    public init(executor:Executor) {
+    public init(executor:@escaping Executor) {
         self.executor = executor
     }
     
-    public func async(task:SafeTask) {
+    public func async(task:@escaping SafeTask) {
         executor {
             let context = currentContext.value
             defer {
@@ -37,14 +37,14 @@ public class CustomExecutionContext : ExecutionContextBase, ExecutionContextProt
         }
     }
     
-    public func async(after:Timeout, task:SafeTask) {
+    public func async(after:Timeout, task:@escaping SafeTask) {
         async {
             Thread.sleep(timeout: after)
             task()
         }
     }
     
-    public func sync<ReturnType>(task:TaskWithResult<ReturnType>) rethrows -> ReturnType {
+    public func sync<ReturnType>(task:@escaping TaskWithResult<ReturnType>) rethrows -> ReturnType {
         return try syncThroughAsync(task: task)
     }
     

@@ -21,7 +21,7 @@ import RunLoop
 private class ParallelContext : ExecutionContextBase, ExecutionContextProtocol {
     let id = NSUUID()
     
-    func runAsync(task:SafeTask) {
+    func runAsync(task:@escaping SafeTask) {
         do {
             try Thread.detach {
                 if (!RunLoop.trySetFactory {
@@ -52,17 +52,17 @@ private class ParallelContext : ExecutionContextBase, ExecutionContextProtocol {
         }
     }
     
-    func async(task:SafeTask) {
+    func async(task:@escaping SafeTask) {
         runAsync(task: task)
     }
     
-    func async(after:Timeout, task:SafeTask) {
+    func async(after:Timeout, task:@escaping SafeTask) {
         runAsync {
             RunLoop.current!.execute(delay: after, task: task)
         }
     }
     
-    func sync<ReturnType>(task:TaskWithResult<ReturnType>) rethrows -> ReturnType {
+    func sync<ReturnType>(task:@escaping TaskWithResult<ReturnType>) rethrows -> ReturnType {
         return try syncThroughAsync(task: task)
     }
     
@@ -109,15 +109,15 @@ private class SerialContext : ExecutionContextBase, ExecutionContextProtocol {
         }
     }
     
-    func async(task:SafeTask) {
+    func async(task:@escaping SafeTask) {
         loop.execute(task: task)
     }
     
-    func async(after:Timeout, task:SafeTask) {
+    func async(after:Timeout, task:@escaping SafeTask) {
         loop.execute(delay: after, task: task)
     }
     
-    func sync<ReturnType>(task:TaskWithResult<ReturnType>) rethrows -> ReturnType {
+    func sync<ReturnType>(task:@escaping TaskWithResult<ReturnType>) rethrows -> ReturnType {
         return try loop.sync(task: task)
     }
     
@@ -151,21 +151,21 @@ public class RunLoopExecutionContext : ExecutionContextBase, ExecutionContextPro
         self.init(inner: kind.createInnerContext())
     }
     
-    public func async(task:SafeTask) {
+    public func async(task:@escaping SafeTask) {
         inner.async {
             currentContext.value = self
             task()
         }
     }
     
-    public func async(after:Timeout, task:SafeTask) {
+    public func async(after:Timeout, task:@escaping SafeTask) {
         inner.async(after: after) {
             currentContext.value = self
             task()
         }
     }
     
-    public func sync<ReturnType>(task:TaskWithResult<ReturnType>) rethrows -> ReturnType {
+    public func sync<ReturnType>(task:@escaping TaskWithResult<ReturnType>) rethrows -> ReturnType {
         if self.isCurrent {
             return try task()
         }

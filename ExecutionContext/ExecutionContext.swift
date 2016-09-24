@@ -38,21 +38,22 @@ private func stockErrorHandler(e:Error) throws -> Bool {
 public protocol ErrorHandlerRegistry {
     var errorHandlers:[ErrorHandler] {get}
     
-    func register(errorHandler:ErrorHandler)
+    func register(errorHandler:@escaping ErrorHandler)
 }
 
 public protocol TaskScheduler {
-    func async(task:Task)
-    func async(task:SafeTask)
+    func async(task:@escaping Task)
+    func async(task:@escaping SafeTask)
     
-    func async(after:Timeout, task:Task)
-    func async(after:Timeout, task:SafeTask)
+    func async(after:Timeout, task:@escaping Task)
+    func async(after:Timeout, task:@escaping SafeTask)
     
-    func sync<ReturnType>(task:TaskWithResult<ReturnType>) rethrows -> ReturnType
+    //TODO: find a way of escaping/non-escaping enforcement. Logially sync is non-escaping
+    func sync<ReturnType>(task:@escaping TaskWithResult<ReturnType>) rethrows -> ReturnType
 }
 
 public protocol ExecutionContextProtocol : TaskScheduler, ErrorHandlerRegistry, NonStrictEquatable {
-    func execute(task:SafeTask)
+    func execute(task:@escaping SafeTask)
     
     var kind:ExecutionContextKind {get}
     
@@ -87,7 +88,7 @@ public extension ExecutionContextProtocol {
 }
 
 public extension ExecutionContextProtocol {
-    public func execute(task:SafeTask) {
+    public func execute(task:@escaping SafeTask) {
         async(task: task)
     }
     
@@ -101,7 +102,7 @@ public extension ExecutionContextProtocol {
 import RunLoop
 
 extension ExecutionContextProtocol {
-    func syncThroughAsync<ReturnType>(task:TaskWithResult<ReturnType>) rethrows -> ReturnType {
+    func syncThroughAsync<ReturnType>(task:@escaping TaskWithResult<ReturnType>) rethrows -> ReturnType {
         if isCurrent {
             return try task()
         }
@@ -123,7 +124,7 @@ extension ExecutionContextProtocol {
     }
 }
 
-public typealias Executor = (SafeTask)->Void
+public typealias Executor = (@escaping SafeTask)->Void
 
 public class ExecutionContextBase : ErrorHandlerRegistry {
     public var errorHandlers = [ErrorHandler]()
@@ -132,7 +133,7 @@ public class ExecutionContextBase : ErrorHandlerRegistry {
         errorHandlers.append(stockErrorHandler)
     }
     
-    public func register(errorHandler handler:ErrorHandler) {
+    public func register(errorHandler handler:@escaping ErrorHandler) {
         //keep last one as it's stock
         errorHandlers.insert(handler, at: errorHandlers.endIndex.advanced(by: -1))
     }
@@ -152,7 +153,7 @@ public extension ErrorHandlerRegistry where Self : TaskScheduler {
         }
     }
     
-    public func async(task:Task) {
+    public func async(task:@escaping Task) {
         //specify explicitely, that it's safe task
         async { () -> Void in
             do {
@@ -164,7 +165,7 @@ public extension ErrorHandlerRegistry where Self : TaskScheduler {
     }
     
     //after is in seconds
-    public func async(after:Timeout, task:Task) {
+    public func async(after:Timeout, task:@escaping Task) {
         //specify explicitely, that it's safe task
         async(after: after) { () -> Void in
             do {
@@ -187,7 +188,7 @@ public let immediate:ExecutionContextProtocol = ImmediateExecutionContext()
 public let main:ExecutionContextProtocol = ExecutionContext.main
 public let global:ExecutionContextProtocol = ExecutionContext.global
 
-public func executionContext(executor:Executor) -> ExecutionContextProtocol {
+public func executionContext(executor:@escaping Executor) -> ExecutionContextProtocol {
     return CustomExecutionContext(executor: executor)
 }
 
@@ -210,7 +211,7 @@ public extension ExecutionContextProtocol {
 
 public extension ExecutionContextProtocol {
     //if context is current - executes immediately. Schedules to the context otherwise
-    public func immediateIfCurrent(task:SafeTask) {
+    public func immediateIfCurrent(task:@escaping SafeTask) {
         //can avoid first check but is here for optimization
         if immediate.isEqual(to: self) || isCurrent {
             task()

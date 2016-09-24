@@ -49,21 +49,21 @@
             }
         }
         
-        public func async(task:SafeTask) {
+        public func async(task:@escaping SafeTask) {
             loop.execute {
                 currentContext.value = self
                 task()
             }
         }
         
-        public func async(after:Timeout, task:SafeTask) {
+        public func async(after:Timeout, task:@escaping SafeTask) {
             loop.execute(delay: after) {
                 currentContext.value = self
                 task()
             }
         }
         
-        public func sync<ReturnType>(task:TaskWithResult<ReturnType>) rethrows -> ReturnType {
+        public func sync<ReturnType>(task:@escaping TaskWithResult<ReturnType>) rethrows -> ReturnType {
             if isCurrent {
                 return try task()
             }
