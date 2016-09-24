@@ -200,7 +200,7 @@ public extension ExecutionContextProtocol {
             if Thread.isMain {
                 return ExecutionContext.main
             }
-            if currentContext.value == nil {
+            if nil == currentContext.value {
                 //TODO: think
 //                currentContext.value = RunLoopExecutionContext(inner: <#T##ExecutionContextType#>)
             }
