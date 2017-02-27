@@ -20,9 +20,8 @@ let package = Package(
     name: "ExecutionContext",
     targets: [Target(name: "ExecutionContext")],
     dependencies: [
-        .Package(url: "https://github.com/antitypical/Result.git", majorVersion: 2),
-        .Package(url: "https://github.com/crossroadlabs/Boilerplate.git", majorVersion: 0, minor: 1),
-        .Package(url: "https://github.com/crossroadlabs/XCTest3.git", majorVersion: 0, minor: 1),
-        .Package(url: "https://github.com/reactive-swift/RunLoop.git", majorVersion: 0, minor: 1),
-    ]
+        .Package(url: "https://github.com/crossroadlabs/Boilerplate.git", majorVersion: 1, minor: 0),
+        .Package(url: "https://github.com/reactive-swift/RunLoop.git", "1.0.0-alpha.2")
+    ],
+    exclude: ["Carthage"]
 )
