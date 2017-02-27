@@ -1,3 +1,2 @@
-github "antitypical/Result" ~> 2.0
-github "crossroadlabs/Boilerplate" ~> 0.1
-github "reactive-swift/RunLoop" "master"
+github "crossroadlabs/Boilerplate" ~> 1.0
+github "reactive-swift/RunLoop" ~> 1.0

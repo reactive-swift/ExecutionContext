@@ -17,10 +17,6 @@
 import XCTest
 @testable import ExecutionContext
 
-#if !os(tvOS)
-    import XCTest3
-#endif
-
 #if os(Linux)
     import Glibc
 #endif
@@ -33,103 +29,103 @@ class ExecutionContextTests: XCTestCase {
     //Tests does not create static variables. We need initialized main thread
     //let mainContext = DefaultExecutionContext.main
     
-    func syncTest(context:ExecutionContextType) {
+    func syncTest(context:ExecutionContextProtocol) {
         
-        let expectation = self.expectation(withDescription: "OK SYNC")
+        let expectation = self.expectation(description: "OK SYNC")
         
         context.sync {
             expectation.fulfill()
         }
         
-        self.waitForExpectations(withTimeout: 0, handler: nil)
+        self.waitForExpectations(timeout: 0, handler: nil)
     }
     
-    func asyncTest(context:ExecutionContextType, runRunLoop: Bool = false) {
-        let expectation = self.expectation(withDescription: "OK ASYNC")
+    func asyncTest(context:ExecutionContextProtocol, runRunLoop: Bool = false) {
+        let expectation = self.expectation(description: "OK ASYNC")
         
         context.async {
             if runRunLoop {
-                (RunLoop.current as! RunnableRunLoopType).run(.In(timeout: 1))
+                let _ = (RunLoop.reactive.current! as! RunnableRunLoopProtocol).run(timeout: .In(timeout: 1))
             } else {
-                Thread.sleep(1)
+                Thread.sleep(timeout: 1)
             }
             expectation.fulfill()
         }
         
         if runRunLoop {
-            (RunLoop.current as! RunnableRunLoopType).run(.In(timeout: 2))
+            let _ = (RunLoop.reactive.current! as! RunnableRunLoopProtocol).run(timeout: .In(timeout: 2))
         }
         
-        self.waitForExpectations(withTimeout: 2, handler: nil)
+        self.waitForExpectations(timeout: 2, handler: nil)
     }
     
-    func afterTest(context:ExecutionContextType, runRunLoop: Bool = false) {
-        let expectation = self.expectation(withDescription: "OK AFTER")
+    func afterTest(context:ExecutionContextProtocol, runRunLoop: Bool = false) {
+        let expectation = self.expectation(description: "OK AFTER")
         
-        context.async(0.5) {
+        context.async(after: 0.5) {
             expectation.fulfill()
         }
         
         if runRunLoop {
-            (RunLoop.current as! RunnableRunLoopType).run(.In(timeout: 3))
+            let _ = (RunLoop.reactive.current! as! RunnableRunLoopProtocol).run(timeout: .In(timeout: 3))
         }
         
-        self.waitForExpectations(withTimeout: 3, handler: nil)
+        self.waitForExpectations(timeout: 3, handler: nil)
     }
     
-    func afterTestAdvanced(context:ExecutionContextType, runRunLoop: Bool = false) {
+    func afterTestAdvanced(context:ExecutionContextProtocol, runRunLoop: Bool = false) {
         var ok = true
         
-        context.async(3) {
+        context.async(after: 3) {
             ok = false
         }
         
         if runRunLoop {
-            (RunLoop.current as! RunnableRunLoopType).run(.In(timeout: 2))
+            let _ = (RunLoop.reactive.current! as! RunnableRunLoopProtocol).run(timeout: .In(timeout: 2))
         } else {
-            Thread.sleep(2.0)
+            Thread.sleep(timeout: 2.0)
         }
         
         XCTAssert(ok)
         
         if runRunLoop {
-            (RunLoop.current as! RunnableRunLoopType).run(.In(timeout: 2))
+            let _ = (RunLoop.reactive.current! as! RunnableRunLoopProtocol).run(timeout: .In(timeout: 2))
         } else {
-            Thread.sleep(2.0)
+            Thread.sleep(timeout: 2.0)
         }
         
         XCTAssertFalse(ok)
     }
     
     func testSerial() {
-        let context:ExecutionContextType = DefaultExecutionContext(kind: .serial)
+        let context:ExecutionContextProtocol = DefaultExecutionContext(kind: .serial)
         
-        syncTest(context)
-        asyncTest(context)
-        afterTest(context)
-        afterTestAdvanced(context)
+        syncTest(context: context)
+        asyncTest(context: context)
+        afterTest(context: context)
+        afterTestAdvanced(context: context)
     }
     
     func testParallel() {
-        let context:ExecutionContextType = DefaultExecutionContext(kind: .parallel)
+        let context:ExecutionContextProtocol = DefaultExecutionContext(kind: .parallel)
         
-        syncTest(context)
-        asyncTest(context)
-        afterTest(context)
-        afterTestAdvanced(context)
+        syncTest(context: context)
+        asyncTest(context: context)
+        afterTest(context: context)
+        afterTestAdvanced(context: context)
     }
     
     func testGlobal() {
-        let context:ExecutionContextType = DefaultExecutionContext.global
+        let context:ExecutionContextProtocol = DefaultExecutionContext.global
         
-        syncTest(context)
-        asyncTest(context)
-        afterTest(context)
-        afterTestAdvanced(context)
+        syncTest(context: context)
+        asyncTest(context: context)
+        afterTest(context: context)
+        afterTestAdvanced(context: context)
     }
     
     func testMain() {
-        let context:ExecutionContextType = DefaultExecutionContext.main
+        let context:ExecutionContextProtocol = DefaultExecutionContext.main
         #if os(Linux)
             let runRunLoop = true
         #else
@@ -137,24 +133,24 @@ class ExecutionContextTests: XCTestCase {
         #endif
         
         #if !os(Linux)
-            syncTest(context)
+            syncTest(context: context)
         #endif
-        asyncTest(context, runRunLoop: runRunLoop)
-        afterTest(context, runRunLoop: runRunLoop)
+        asyncTest(context: context, runRunLoop: runRunLoop)
+        afterTest(context: context, runRunLoop: runRunLoop)
         //afterTestAdvanced - no it will not work here
     }
     
     func testCustomOnGlobal() {
-        let context = executionContext(global.execute)
+        let context = executionContext(executor: global.execute)
         
-        syncTest(context)
-        asyncTest(context)
-        afterTest(context)
-        afterTestAdvanced(context)
+        syncTest(context: context)
+        asyncTest(context: context)
+        afterTest(context: context)
+        afterTestAdvanced(context: context)
     }
     
     func testCustomOnMain() {
-        let context = executionContext(main.execute)
+        let context = executionContext(executor: main.execute)
         #if os(Linux)
             let runRunLoop = true
         #else
@@ -162,8 +158,8 @@ class ExecutionContextTests: XCTestCase {
         #endif
         
 //        syncTest(context)
-        asyncTest(context, runRunLoop: runRunLoop)
-        afterTest(context, runRunLoop: runRunLoop)
+        asyncTest(context: context, runRunLoop: runRunLoop)
+        afterTest(context: context, runRunLoop: runRunLoop)
         //afterTestAdvanced - no it will not work here
     }
     
@@ -172,9 +168,9 @@ class ExecutionContextTests: XCTestCase {
             task()
         }
         
-        syncTest(context)
-        asyncTest(context)
-        afterTest(context)
+        syncTest(context: context)
+        asyncTest(context: context)
+        afterTest(context: context)
         //afterTestAdvanced - no it will not work here
     }
 }
