@@ -152,25 +152,19 @@
 		92E409101CBC32F2001ED069 /* ExecutionContext.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = ExecutionContext.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		92E409191CBC32F2001ED069 /* ExecutionContextTests-iOS.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = "ExecutionContextTests-iOS.xctest"; sourceTree = BUILT_PRODUCTS_DIR; };
 		92E4092E1CBC33F9001ED069 /* Boilerplate.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; path = Boilerplate.framework; sourceTree = "<group>"; };
-		92E4092F1CBC33F9001ED069 /* Foundation3.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; path = Foundation3.framework; sourceTree = "<group>"; };
 		92E409301CBC33F9001ED069 /* Result.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; path = Result.framework; sourceTree = "<group>"; };
-		92E409311CBC33F9001ED069 /* XCTest3.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; path = XCTest3.framework; sourceTree = "<group>"; };
 		92E4093E1CBC344D001ED069 /* Boilerplate.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; path = Boilerplate.framework; sourceTree = "<group>"; };
-		92E4093F1CBC344D001ED069 /* Foundation3.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; path = Foundation3.framework; sourceTree = "<group>"; };
 		92E409401CBC344D001ED069 /* Result.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; path = Result.framework; sourceTree = "<group>"; };
 		92E409411CBC344D001ED069 /* RunLoop.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; path = RunLoop.framework; sourceTree = "<group>"; };
 		92E409421CBC344D001ED069 /* UV.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; path = UV.framework; sourceTree = "<group>"; };
-		92E409431CBC344D001ED069 /* XCTest3.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; path = XCTest3.framework; sourceTree = "<group>"; };
 		92E409EE1CC10541001ED069 /* RunLoop.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; path = RunLoop.framework; sourceTree = "<group>"; };
 		92E409F81CC10677001ED069 /* ExecutionContext.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = ExecutionContext.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		92E40A011CC10677001ED069 /* ExecutionContextTests-tvOS.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = "ExecutionContextTests-tvOS.xctest"; sourceTree = BUILT_PRODUCTS_DIR; };
 		92E40A181CC10761001ED069 /* Boilerplate.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; path = Boilerplate.framework; sourceTree = "<group>"; };
-		92E40A191CC10761001ED069 /* Foundation3.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; path = Foundation3.framework; sourceTree = "<group>"; };
 		92E40A1A1CC10761001ED069 /* Result.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; path = Result.framework; sourceTree = "<group>"; };
 		92E40A1B1CC10761001ED069 /* RunLoop.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; path = RunLoop.framework; sourceTree = "<group>"; };
 		92E40A2E1CC107D0001ED069 /* ExecutionContext.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = ExecutionContext.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		92E40A3D1CC10895001ED069 /* Boilerplate.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; path = Boilerplate.framework; sourceTree = "<group>"; };
-		92E40A3E1CC10895001ED069 /* Foundation3.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; path = Foundation3.framework; sourceTree = "<group>"; };
 		92E40A3F1CC10895001ED069 /* Result.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; path = Result.framework; sourceTree = "<group>"; };
 		92E40A401CC10895001ED069 /* RunLoop.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; path = RunLoop.framework; sourceTree = "<group>"; };
 /* End PBXFileReference section */
@@ -298,7 +292,7 @@
 				65D6378F1C943764000F5548 /* Info.plist */,
 			);
 			name = ExecutionContextTests;
-			path = Tests/ExecutionContext;
+			path = Tests/ExecutionContextTests;
 			sourceTree = "<group>";
 		};
 		65D637A61C94383C000F5548 /* Frameworks */ = {
@@ -317,11 +311,9 @@
 			isa = PBXGroup;
 			children = (
 				92E4093E1CBC344D001ED069 /* Boilerplate.framework */,
-				92E4093F1CBC344D001ED069 /* Foundation3.framework */,
 				92E409401CBC344D001ED069 /* Result.framework */,
 				92E409411CBC344D001ED069 /* RunLoop.framework */,
 				92E409421CBC344D001ED069 /* UV.framework */,
-				92E409431CBC344D001ED069 /* XCTest3.framework */,
 			);
 			path = Mac;
 			sourceTree = "<group>";
@@ -331,9 +323,7 @@
 			children = (
 				92E409EE1CC10541001ED069 /* RunLoop.framework */,
 				92E4092E1CBC33F9001ED069 /* Boilerplate.framework */,
-				92E4092F1CBC33F9001ED069 /* Foundation3.framework */,
 				92E409301CBC33F9001ED069 /* Result.framework */,
-				92E409311CBC33F9001ED069 /* XCTest3.framework */,
 			);
 			path = iOS;
 			sourceTree = "<group>";
@@ -342,7 +332,6 @@
 			isa = PBXGroup;
 			children = (
 				92E40A181CC10761001ED069 /* Boilerplate.framework */,
-				92E40A191CC10761001ED069 /* Foundation3.framework */,
 				92E40A1A1CC10761001ED069 /* Result.framework */,
 				92E40A1B1CC10761001ED069 /* RunLoop.framework */,
 			);
@@ -353,7 +342,6 @@
 			isa = PBXGroup;
 			children = (
 				92E40A3D1CC10895001ED069 /* Boilerplate.framework */,
-				92E40A3E1CC10895001ED069 /* Foundation3.framework */,
 				92E40A3F1CC10895001ED069 /* Result.framework */,
 				92E40A401CC10895001ED069 /* RunLoop.framework */,
 			);
@@ -887,7 +875,7 @@
 					"$(inherited)",
 					"$(PROJECT_DIR)/Carthage/Build/Mac",
 				);
-				INFOPLIST_FILE = Tests/ExecutionContext/Info.plist;
+				INFOPLIST_FILE = Tests/ExecutionContextTests/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/../Frameworks @loader_path/../Frameworks";
 				PRODUCT_BUNDLE_IDENTIFIER = xyz.crossroadlabs.ExecutionContextTests;
 				PRODUCT_NAME = "$(TARGET_NAME)";
@@ -904,7 +892,7 @@
 					"$(inherited)",
 					"$(PROJECT_DIR)/Carthage/Build/Mac",
 				);
-				INFOPLIST_FILE = Tests/ExecutionContext/Info.plist;
+				INFOPLIST_FILE = Tests/ExecutionContextTests/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/../Frameworks @loader_path/../Frameworks";
 				PRODUCT_BUNDLE_IDENTIFIER = xyz.crossroadlabs.ExecutionContextTests;
 				PRODUCT_NAME = "$(TARGET_NAME)";
@@ -973,7 +961,7 @@
 					"$(inherited)",
 					"$(PROJECT_DIR)/Carthage/Build/iOS",
 				);
-				INFOPLIST_FILE = Tests/ExecutionContext/Info.plist;
+				INFOPLIST_FILE = Tests/ExecutionContextTests/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 9.2;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
 				PRODUCT_BUNDLE_IDENTIFIER = "xyz.crossroadlabs.ExecutionContextTests-iOS";
@@ -991,7 +979,7 @@
 					"$(inherited)",
 					"$(PROJECT_DIR)/Carthage/Build/iOS",
 				);
-				INFOPLIST_FILE = Tests/ExecutionContext/Info.plist;
+				INFOPLIST_FILE = Tests/ExecutionContextTests/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 9.2;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
 				PRODUCT_BUNDLE_IDENTIFIER = "xyz.crossroadlabs.ExecutionContextTests-iOS";
@@ -1062,7 +1050,7 @@
 					"$(inherited)",
 					"$(PROJECT_DIR)/Carthage/Build/tvOS",
 				);
-				INFOPLIST_FILE = Tests/ExecutionContext/Info.plist;
+				INFOPLIST_FILE = Tests/ExecutionContextTests/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
 				PRODUCT_BUNDLE_IDENTIFIER = xyz.crossroadlabs.ExecutionContextTests;
 				PRODUCT_NAME = "$(TARGET_NAME)";
@@ -1079,7 +1067,7 @@
 					"$(inherited)",
 					"$(PROJECT_DIR)/Carthage/Build/tvOS",
 				);
-				INFOPLIST_FILE = Tests/ExecutionContext/Info.plist;
+				INFOPLIST_FILE = Tests/ExecutionContextTests/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
 				PRODUCT_BUNDLE_IDENTIFIER = xyz.crossroadlabs.ExecutionContextTests;
 				PRODUCT_NAME = "$(TARGET_NAME)";
