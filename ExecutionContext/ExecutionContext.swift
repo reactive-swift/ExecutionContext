@@ -101,8 +101,8 @@ public extension ExecutionContextProtocol {
 
 import RunLoop
 
-extension ExecutionContextProtocol {
-    func syncThroughAsync<ReturnType>(task:@escaping TaskWithResult<ReturnType>) rethrows -> ReturnType {
+public extension ExecutionContextProtocol {
+    public func syncThroughAsync<ReturnType>(task:@escaping TaskWithResult<ReturnType>) rethrows -> ReturnType {
         if isCurrent {
             return try task()
         }
