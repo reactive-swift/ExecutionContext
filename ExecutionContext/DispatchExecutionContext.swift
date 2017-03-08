@@ -45,20 +45,20 @@
             self.loop = DispatchRunLoop(queue: queue)
             super.init()
             loop.execute {
-                currentContext.value = self
+                _currentContext.value = self
             }
         }
         
         public func async(task:@escaping SafeTask) {
             loop.execute {
-                currentContext.value = self
+                _currentContext.value = self
                 task()
             }
         }
         
         public func async(after:Timeout, task:@escaping SafeTask) {
             loop.execute(delay: after) {
-                currentContext.value = self
+                _currentContext.value = self
                 task()
             }
         }
@@ -69,7 +69,7 @@
             }
             
             return try loop.sync {
-                currentContext.value = self
+                _currentContext.value = self
                 return try task()
             }
         }

@@ -192,7 +192,8 @@ public func executionContext(executor:@escaping Executor) -> ExecutionContextPro
     return CustomExecutionContext(executor: executor)
 }
 
-var currentContext = try! ThreadLocal<ExecutionContextProtocol>()
+//Never use it directly
+public var _currentContext = try! ThreadLocal<ExecutionContextProtocol>()
 
 public extension ExecutionContextProtocol {
     public static var current:ExecutionContextProtocol {
@@ -200,11 +201,11 @@ public extension ExecutionContextProtocol {
             if Thread.isMain {
                 return ExecutionContext.main
             }
-            if nil == currentContext.value {
+            if nil == _currentContext.value {
                 //TODO: think
 //                currentContext.value = RunLoopExecutionContext(inner: <#T##ExecutionContextType#>)
             }
-            return currentContext.value!
+            return _currentContext.value!
         }
     }
 }

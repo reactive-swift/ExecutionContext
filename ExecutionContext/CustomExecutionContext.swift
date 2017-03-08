@@ -27,11 +27,11 @@ public class CustomExecutionContext : ExecutionContextBase, ExecutionContextProt
     
     public func async(task:@escaping SafeTask) {
         executor {
-            let context = currentContext.value
+            let context = _currentContext.value
             defer {
-                currentContext.value = context
+                _currentContext.value = context
             }
-            currentContext.value = self
+            _currentContext.value = self
             
             task()
         }

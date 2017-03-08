@@ -19,11 +19,11 @@ import Boilerplate
 
 class ImmediateExecutionContext : ExecutionContextBase, ExecutionContextProtocol {
     func async(task:@escaping SafeTask) {
-        let context = currentContext.value
+        let context = _currentContext.value
         defer {
-            currentContext.value = context
+            _currentContext.value = context
         }
-        currentContext.value = self
+        _currentContext.value = self
         
         task()
     }
@@ -36,11 +36,11 @@ class ImmediateExecutionContext : ExecutionContextBase, ExecutionContextProtocol
     }
     
     func sync<ReturnType>(task:@escaping TaskWithResult<ReturnType>) rethrows -> ReturnType {
-        let context = currentContext.value
+        let context = _currentContext.value
         defer {
-            currentContext.value = context
+            _currentContext.value = context
         }
-        currentContext.value = self
+        _currentContext.value = self
         
         return try task()
     }
