@@ -126,7 +126,7 @@ extension ExecutionContextProtocol {
 
 public typealias Executor = (@escaping SafeTask)->Void
 
-public class ExecutionContextBase : ErrorHandlerRegistry {
+open class ExecutionContextBase : ErrorHandlerRegistry {
     public var errorHandlers = [ErrorHandler]()
     
     public init() {
