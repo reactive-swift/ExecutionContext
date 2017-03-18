@@ -113,7 +113,7 @@ public extension ExecutionContextProtocol {
             let sema = RunLoop.semaphore()
             
             async {
-                result = materializeAny(task)
+                result = materialize(task)
                 let _ = sema.signal()
             }
             

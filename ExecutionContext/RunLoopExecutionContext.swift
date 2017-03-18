@@ -42,9 +42,9 @@ private class ParallelContext : ExecutionContextBase, ExecutionContextProtocol {
             }
         } catch let e as CError {
             switch e {
-            case .Unknown:
+            case .unknown:
                 print("Got unknown CError while creating pthread")
-            case .Code(let code):
+            case .code(let code):
                 print("Got CError with code \(code) while creating pthread")
             }
         } catch {
