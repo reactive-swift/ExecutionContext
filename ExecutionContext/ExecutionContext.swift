@@ -16,6 +16,7 @@
 
 import Foundation
 import Result
+import Boilerplate
 
 #if os(Linux)
     import Glibc
@@ -25,155 +26,198 @@ import Result
     import Dispatch
 #endif
 
-public typealias Task = () throws -> Void
-public typealias SafeTask = () -> Void
-
 // return true if error successfully handled, false otherwise
-public typealias ErrorHandler = (e:ErrorType) throws -> Bool
+public typealias ErrorHandler = (Error) throws -> Bool
 
-private func stockErrorHandler(e:ErrorType) throws -> Bool {
+private func stockErrorHandler(e:Error) throws -> Bool {
     let errorName = Mirror(reflecting: e).description
     print(errorName, " was thrown but not handled")
     return true
 }
 
-public protocol ErrorHandlerRegistryType {
+public protocol ErrorHandlerRegistry {
     var errorHandlers:[ErrorHandler] {get}
     
-    func registerErrorHandler(handler:ErrorHandler)
+    func register(errorHandler:@escaping ErrorHandler)
 }
 
-public protocol TaskSchedulerType {
-    func async(task:Task)
-    func async(task:SafeTask)
+public protocol TaskScheduler {
+    func async(task:@escaping Task)
+    func async(task:@escaping SafeTask)
     
-    //after is in seconds
-    func async(after:Double, task:Task)
-    func async(after:Double, task:SafeTask)
+    func async(after:Timeout, task:@escaping Task)
+    func async(after:Timeout, task:@escaping SafeTask)
     
-    func sync<ReturnType>(task:() throws -> ReturnType) throws -> ReturnType
-    func sync<ReturnType>(task:() -> ReturnType) -> ReturnType
+    //TODO: find a way of escaping/non-escaping enforcement. Logially sync is non-escaping
+    func sync<ReturnType>(task:@escaping TaskWithResult<ReturnType>) rethrows -> ReturnType
 }
 
-public protocol ExecutionContextType : TaskSchedulerType, ErrorHandlerRegistryType {
-    func execute(task:SafeTask)
+public protocol ExecutionContextProtocol : TaskScheduler, ErrorHandlerRegistry, NonStrictEquatable {
+    func execute(task:@escaping SafeTask)
+    
+    var kind:ExecutionContextKind {get}
+    
+    //in case of parallel contexts should return serial context bound to this parallel context. Returns self if already serial
+    var serial:ExecutionContextProtocol {get}
+    
+    //in case of serial that is bound to a parallel context should return a parrallel context it is bound to. Returns "global" if it's not bound to any parallel context
+    var parallel:ExecutionContextProtocol {get}
+    
+    static var current:ExecutionContextProtocol {get}
 }
 
-public extension ExecutionContextType {
-    func execute(task:SafeTask) {
-        async(task)
+//DUMMY IMPLEMENTATION TO MAINTAIN BUILDABLE CODE. SUBJECT TO BE REMOVED ASAP
+public extension ExecutionContextProtocol {
+    public var kind:ExecutionContextKind {
+        get {
+            return .serial
+        }
+    }
+    
+    var serial:ExecutionContextProtocol {
+        get {
+            return self
+        }
+    }
+    
+    var parallel:ExecutionContextProtocol {
+        get {
+            return global
+        }
     }
 }
 
-public typealias Executor = (SafeTask)->Void
+public extension ExecutionContextProtocol {
+    public func execute(task:@escaping SafeTask) {
+        async(task: task)
+    }
+    
+    public var isCurrent:Bool {
+        get {
+            return Self.current.isEqual(to: self)
+        }
+    }
+}
 
-public class ExecutionContextBase : ErrorHandlerRegistryType {
+import RunLoop
+
+public extension ExecutionContextProtocol {
+    public func syncThroughAsync<ReturnType>(task:@escaping TaskWithResult<ReturnType>) rethrows -> ReturnType {
+        if isCurrent {
+            return try task()
+        }
+        
+        return try {
+            var result:Result<ReturnType, AnyError>?
+            
+            let sema = RunLoop.semaphore()
+            
+            async {
+                result = materialize(task)
+                let _ = sema.signal()
+            }
+            
+            let _ = sema.wait()
+            
+            return try result!.dematerializeAny()
+        }()
+    }
+}
+
+public typealias Executor = (@escaping SafeTask)->Void
+
+open class ExecutionContextBase : ErrorHandlerRegistry {
     public var errorHandlers = [ErrorHandler]()
     
     public init() {
         errorHandlers.append(stockErrorHandler)
     }
     
-    public func registerErrorHandler(handler:ErrorHandler) {
+    public func register(errorHandler handler:@escaping ErrorHandler) {
         //keep last one as it's stock
-        errorHandlers.insert(handler, atIndex: errorHandlers.endIndex.advancedBy(-1))
+        errorHandlers.insert(handler, at: errorHandlers.endIndex.advanced(by: -1))
     }
 }
 
-public extension ErrorHandlerRegistryType where Self : TaskSchedulerType {
-    func handleError(e:ErrorType) {
+public extension ErrorHandlerRegistry where Self : TaskScheduler {
+    func handle(error:Error) {
         for handler in errorHandlers {
             do {
-                if try handler(e: e) {
+                if try handler(error) {
                     break
                 }
             } catch let e {
-                handleError(e)
+                handle(error: e)
                 break
             }
         }
     }
     
-    public func async(task:Task) {
+    public func async(task:@escaping Task) {
         //specify explicitely, that it's safe task
         async { () -> Void in
             do {
                 try task()
             } catch let e {
-                self.handleError(e)
+                self.handle(error: e)
             }
         }
     }
     
     //after is in seconds
-    func async(after:Double, task:Task) {
+    public func async(after:Timeout, task:@escaping Task) {
         //specify explicitely, that it's safe task
-        async(after) { () -> Void in
+        async(after: after) { () -> Void in
             do {
                 try task()
             } catch let e {
-                self.handleError(e)
+                self.handle(error: e)
             }
         }
     }
 }
 
-public extension TaskSchedulerType {
-    public func sync<ReturnType>(task:() -> ReturnType) -> ReturnType {
-        return try! sync { () throws -> ReturnType in
-            return task()
-        }
-    }
-}
-
 public enum ExecutionContextKind {
-    case Serial
-    case Parallel
+    case serial
+    case parallel
 }
 
 public typealias ExecutionContext = DefaultExecutionContext
 
-extension ExecutionContextType {
-    func syncThroughAsync<ReturnType>(task:() throws -> ReturnType) throws -> ReturnType {
-        var result:Result<ReturnType, AnyError>?
-        
-        let sema = LoopSemaphore()
-        sema.willUse()
-        defer {
-            sema.didUse()
-        }
-        
-        async {
-            result = materialize(task)
-            sema.signal()
-        }
-        
-        sema.wait()
-        
-        return try result!.dematerializeAnyError()
-    }
-}
+public let immediate:ExecutionContextProtocol = ImmediateExecutionContext()
+public let main:ExecutionContextProtocol = ExecutionContext.main
+public let global:ExecutionContextProtocol = ExecutionContext.global
 
-public let immediate:ExecutionContextType = ImmediateExecutionContext()
-public let main:ExecutionContextType = ExecutionContext.main
-public let global:ExecutionContextType = ExecutionContext.global
-
-public func executionContext(executor:Executor) -> ExecutionContextType {
+public func executionContext(executor:@escaping Executor) -> ExecutionContextProtocol {
     return CustomExecutionContext(executor: executor)
 }
 
-public func sleep(timeout:Double) {
-    let sec = time_t(timeout)
-    let nsec = Int((timeout - Double(sec)) * 1000 * 1000 * 1000)//nano seconds
-    var time = timespec(tv_sec:sec, tv_nsec: nsec)
-    
-    nanosleep(&time, nil)
+//Never use it directly
+public var _currentContext = try! ThreadLocal<ExecutionContextProtocol>()
+
+public extension ExecutionContextProtocol {
+    public static var current:ExecutionContextProtocol {
+        get {
+            if Thread.isMain {
+                return ExecutionContext.main
+            }
+            if nil == _currentContext.value {
+                //TODO: think
+//                currentContext.value = RunLoopExecutionContext(inner: <#T##ExecutionContextType#>)
+            }
+            return _currentContext.value!
+        }
+    }
 }
 
-@noreturn public func executionContextMain() {
-    #if !os(Linux) || dispatch
-        dispatch_main()
-    #else
-        RunLoop.runForever()
-    #endif
+public extension ExecutionContextProtocol {
+    //if context is current - executes immediately. Schedules to the context otherwise
+    public func immediateIfCurrent(task:@escaping SafeTask) {
+        //can avoid first check but is here for optimization
+        if immediate.isEqual(to: self) || isCurrent {
+            task()
+        } else {
+            execute(task: task)
+        }
+    }
 }

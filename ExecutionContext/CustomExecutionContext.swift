@@ -15,26 +15,43 @@
 //===----------------------------------------------------------------------===//
 
 import Foundation
+import Boilerplate
 
-public class CustomExecutionContext : ExecutionContextBase, ExecutionContextType {
+public class CustomExecutionContext : ExecutionContextBase, ExecutionContextProtocol {
+    let id = NSUUID()
     let executor:Executor
     
-    public init(executor:Executor) {
+    public init(executor:@escaping Executor) {
         self.executor = executor
     }
     
-    public func async(task:SafeTask) {
-        executor(task)
-    }
-    
-    public func async(after:Double, task:SafeTask) {
-        async {
-            sleep(after)
+    public func async(task:@escaping SafeTask) {
+        executor {
+            let context = _currentContext.value
+            defer {
+                _currentContext.value = context
+            }
+            _currentContext.value = self
+            
             task()
         }
     }
     
-    public func sync<ReturnType>(task:() throws -> ReturnType) throws -> ReturnType {
-        return try syncThroughAsync(task)
+    public func async(after:Timeout, task:@escaping SafeTask) {
+        async {
+            Thread.sleep(timeout: after)
+            task()
+        }
+    }
+    
+    public func sync<ReturnType>(task:@escaping TaskWithResult<ReturnType>) rethrows -> ReturnType {
+        return try syncThroughAsync(task: task)
+    }
+    
+    public func isEqual(to other: NonStrictEquatable) -> Bool {
+        guard let other = other as? CustomExecutionContext else {
+            return false
+        }
+        return id.isEqual(other.id)
     }
 }

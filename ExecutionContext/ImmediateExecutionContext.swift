@@ -15,20 +15,37 @@
 //===----------------------------------------------------------------------===//
 
 import Foundation
+import Boilerplate
 
-public class ImmediateExecutionContext : ExecutionContextBase, ExecutionContextType {
-    public func async(task:SafeTask) {
+class ImmediateExecutionContext : ExecutionContextBase, ExecutionContextProtocol {
+    func async(task:@escaping SafeTask) {
+        let context = _currentContext.value
+        defer {
+            _currentContext.value = context
+        }
+        _currentContext.value = self
+        
         task()
     }
     
-    public func async(after:Double, task:SafeTask) {
+    func async(after:Timeout, task:@escaping SafeTask) {
         async {
-            sleep(after)
+            Thread.sleep(timeout: after)
             task()
         }
     }
     
-    public func sync<ReturnType>(task:() throws -> ReturnType) throws -> ReturnType {
+    func sync<ReturnType>(task:@escaping TaskWithResult<ReturnType>) rethrows -> ReturnType {
+        let context = _currentContext.value
+        defer {
+            _currentContext.value = context
+        }
+        _currentContext.value = self
+        
         return try task()
+    }
+    
+    func isEqual(to other:NonStrictEquatable) -> Bool {
+        return other is ImmediateExecutionContext
     }
 }

@@ -18,56 +18,79 @@
     
     import Foundation
     import Dispatch
-    import Result
+    import Boilerplate
+    import RunLoop
     
-    public class DispatchExecutionContext : ExecutionContextBase, ExecutionContextType, DefaultExecutionContextType {
-        private let queue:dispatch_queue_t
+    private extension ExecutionContextKind {
+        func createDispatchQueue(id:String) -> DispatchQueue {
+            switch self {
+            case .serial:
+                return DispatchQueue(label: id)
+            case .parallel:
+                return DispatchQueue(label: id, attributes: .concurrent)
+            }
+        }
+    }
+    
+    public class DispatchExecutionContext : ExecutionContextBase, ExecutionContextProtocol, DefaultExecutionContextProtocol {
+        private let loop:DispatchRunLoop
         
-        public required init(kind:ExecutionContextKind) {
-            let id = NSUUID().UUIDString
-            switch kind {
-            case .Serial: queue = dispatch_queue_create(id, DISPATCH_QUEUE_SERIAL)
-            case .Parallel: queue = dispatch_queue_create(id, DISPATCH_QUEUE_CONCURRENT)
+        public required convenience init(kind:ExecutionContextKind) {
+            let id = NSUUID().uuidString
+            let queue = kind.createDispatchQueue(id: id)
+            self.init(queue: queue)
+        }
+        
+        public init(queue:DispatchQueue) {
+            self.loop = DispatchRunLoop(queue: queue)
+            super.init()
+            loop.execute {
+                _currentContext.value = self
             }
         }
         
-        public init(queue:dispatch_queue_t) {
-            self.queue = queue
-        }
-        
-        public func async(task:SafeTask) {
-            dispatch_async(queue) {
+        public func async(task:@escaping SafeTask) {
+            loop.execute {
+                _currentContext.value = self
                 task()
             }
         }
         
-        public func async(after:Double, task:SafeTask) {
-            if after > 0 {
-                let time = dispatch_time(DISPATCH_TIME_NOW, Int64(after * NSTimeInterval(NSEC_PER_SEC)))
-                dispatch_after(time, queue) {
-                    task()
-                }
-            } else {
-                async(task)
+        public func async(after:Timeout, task:@escaping SafeTask) {
+            loop.execute(delay: after) {
+                _currentContext.value = self
+                task()
             }
         }
         
-        public func sync<ReturnType>(task:() throws -> ReturnType) throws -> ReturnType {
-            if dispatch_queue_get_label(DISPATCH_CURRENT_QUEUE_LABEL) == dispatch_queue_get_label(queue) {
+        public func sync<ReturnType>(task:@escaping TaskWithResult<ReturnType>) rethrows -> ReturnType {
+            if isCurrent {
                 return try task()
-            } else {
-                var result:Result<ReturnType, AnyError>?
-                
-                dispatch_sync(queue) {
-                    result = materialize(task)
-                }
-                
-                return try result!.dematerializeAnyError()
+            }
+            
+            return try loop.sync {
+                _currentContext.value = self
+                return try task()
             }
         }
         
-        public static let main:ExecutionContextType = DispatchExecutionContext(queue: dispatch_get_main_queue())
-        public static let global:ExecutionContextType = DispatchExecutionContext(queue: dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0))
+        public static let main:ExecutionContextProtocol = DispatchExecutionContext(queue: .main)
+        public static let global:ExecutionContextProtocol = DispatchExecutionContext(queue: .global())
+        
+        public static func mainProc() -> Never  {
+            if !Thread.isMain {
+                print("Main proc was called on non-main thread. Exiting")
+                exit(1)
+            }
+            dispatchMain()
+        }
+        
+        public func isEqual(to other: NonStrictEquatable) -> Bool {
+            guard let other = other as? DispatchExecutionContext else {
+                return false
+            }
+            return loop.isEqual(to: other.loop)
+        }
     }
 
 #endif
