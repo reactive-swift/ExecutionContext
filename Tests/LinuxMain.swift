@@ -1,7 +1,9 @@
 import XCTest
 
-@testable import ExecutionContextTestSuite
+import ExecutionContextTests
 
-XCTMain([
-	testCase(ExecutionContextTests.allTests),
-])
+var tests = [XCTestCaseEntry]()
+
+tests += ExecutionContextTests.allTests()
+
+XCTMain(tests)

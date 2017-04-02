@@ -101,8 +101,8 @@ public extension ExecutionContextProtocol {
 
 import RunLoop
 
-extension ExecutionContextProtocol {
-    func syncThroughAsync<ReturnType>(task:@escaping TaskWithResult<ReturnType>) rethrows -> ReturnType {
+public extension ExecutionContextProtocol {
+    public func syncThroughAsync<ReturnType>(task:@escaping TaskWithResult<ReturnType>) rethrows -> ReturnType {
         if isCurrent {
             return try task()
         }
@@ -113,7 +113,7 @@ extension ExecutionContextProtocol {
             let sema = RunLoop.semaphore()
             
             async {
-                result = materializeAny(task)
+                result = materialize(task)
                 let _ = sema.signal()
             }
             
@@ -126,7 +126,7 @@ extension ExecutionContextProtocol {
 
 public typealias Executor = (@escaping SafeTask)->Void
 
-public class ExecutionContextBase : ErrorHandlerRegistry {
+open class ExecutionContextBase : ErrorHandlerRegistry {
     public var errorHandlers = [ErrorHandler]()
     
     public init() {
@@ -192,7 +192,8 @@ public func executionContext(executor:@escaping Executor) -> ExecutionContextPro
     return CustomExecutionContext(executor: executor)
 }
 
-var currentContext = try! ThreadLocal<ExecutionContextProtocol>()
+//Never use it directly
+public var _currentContext = try! ThreadLocal<ExecutionContextProtocol>()
 
 public extension ExecutionContextProtocol {
     public static var current:ExecutionContextProtocol {
@@ -200,11 +201,11 @@ public extension ExecutionContextProtocol {
             if Thread.isMain {
                 return ExecutionContext.main
             }
-            if nil == currentContext.value {
+            if nil == _currentContext.value {
                 //TODO: think
 //                currentContext.value = RunLoopExecutionContext(inner: <#T##ExecutionContextType#>)
             }
-            return currentContext.value!
+            return _currentContext.value!
         }
     }
 }

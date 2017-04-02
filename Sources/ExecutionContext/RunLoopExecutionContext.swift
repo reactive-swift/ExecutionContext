@@ -42,9 +42,9 @@ private class ParallelContext : ExecutionContextBase, ExecutionContextProtocol {
             }
         } catch let e as CError {
             switch e {
-            case .Unknown:
+            case .unknown:
                 print("Got unknown CError while creating pthread")
-            case .Code(let code):
+            case .code(let code):
                 print("Got CError with code \(code) while creating pthread")
             }
         } catch {
@@ -153,14 +153,14 @@ public class RunLoopExecutionContext : ExecutionContextBase, ExecutionContextPro
     
     public func async(task:@escaping SafeTask) {
         inner.async {
-            currentContext.value = self
+            _currentContext.value = self
             task()
         }
     }
     
     public func async(after:Timeout, task:@escaping SafeTask) {
         inner.async(after: after) {
-            currentContext.value = self
+            _currentContext.value = self
             task()
         }
     }
@@ -170,7 +170,7 @@ public class RunLoopExecutionContext : ExecutionContextBase, ExecutionContextPro
             return try task()
         }
         return try inner.sync {
-            currentContext.value = self
+            _currentContext.value = self
             return try task()
         }
     }
