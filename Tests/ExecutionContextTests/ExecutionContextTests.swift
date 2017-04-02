@@ -125,15 +125,15 @@ class ExecutionContextTests: XCTestCase {
     
     func testMain() {
         let context:ExecutionContextProtocol = DefaultExecutionContext.main
-        #if os(Linux)
-            let runRunLoop = true
-        #else
+        //#if os(Linux)
+        //    let runRunLoop = true
+        //#else
             let runRunLoop = false
-        #endif
+        //#endif
         
-        #if !os(Linux)
+        //#if !os(Linux)
             syncTest(context: context)
-        #endif
+        //#endif
         asyncTest(context: context, runRunLoop: runRunLoop)
         afterTest(context: context, runRunLoop: runRunLoop)
         //afterTestAdvanced - no it will not work here
@@ -150,11 +150,11 @@ class ExecutionContextTests: XCTestCase {
     
     func testCustomOnMain() {
         let context = executionContext(executor: main.execute)
-        #if os(Linux)
-            let runRunLoop = true
-        #else
+        //#if os(Linux)
+        //    let runRunLoop = true
+        //#else
             let runRunLoop = false
-        #endif
+        //#endif
         
 //        syncTest(context)
         asyncTest(context: context, runRunLoop: runRunLoop)
