@@ -24,7 +24,6 @@ import XCTest
 import Boilerplate
 import RunLoop
 
-#if !os(tvOS)
 class ExecutionContextTests: XCTestCase {
     //Tests does not create static variables. We need initialized main thread
     //let mainContext = DefaultExecutionContext.main
@@ -174,11 +173,10 @@ class ExecutionContextTests: XCTestCase {
         //afterTestAdvanced - no it will not work here
     }
 }
-#endif
 
 #if os(Linux)
 extension ExecutionContextTests {
-	static var allTests : [(String, ExecutionContextTests -> () throws -> Void)] {
+	static var allTests : [(String, (ExecutionContextTests) -> () throws -> Void)] {
 		return [
 			("testSerial", testSerial),
 			("testParallel", testParallel),

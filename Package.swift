@@ -18,9 +18,7 @@ import PackageDescription
 
 let package = Package(
     name: "ExecutionContext",
-    targets: [Target(name: "ExecutionContext")],
     dependencies: [
         .Package(url: "https://github.com/reactive-swift/RunLoop.git", majorVersion: 0, minor: 2)
-    ],
-    exclude: ["Carthage"]
+    ]
 )
