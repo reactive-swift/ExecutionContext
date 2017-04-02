@@ -22,7 +22,7 @@ import Boilerplate
     import Glibc
 #endif
 
-#if !os(Linux) || dispatch
+#if !nodispatch
     import Dispatch
 #endif
 
